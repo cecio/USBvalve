@@ -1,6 +1,8 @@
 # USBvalve
 *Expose USB activity on the fly*
 
+<img src="https://github.com/cecio/USBvalve/blob/main/pictures/versions.png" alt="The two models" />
+
 I'm sure that, like me, you were asked to put your USB drive in an *unknown* device...and then the doubt: 
 
 what happened to my  poor dongle, behind the scene? Stealing my files? Encrypting them? Or  *just* installing a malware? With **USBvalve** you can spot this out in  seconds: built on super cheap off-the-shelf hardware you can quickly  test any USB file system activity and understand what is going on before it's too late!
@@ -9,7 +11,7 @@ With **USBvalve** you can have an immediate feedback about what happen to the dr
 
 FIXME some pics
 
-<img src="https://github.com/cecio/USBvalve/blob/main/pictures/selftest.png" alt="ghidra_main" style="zoom:75%;" />
+<img src="https://github.com/cecio/USBvalve/blob/main/pictures/selftest.png" alt="Selftest" style="zoom:35%;" />
 
 
 ## Repository Structure
