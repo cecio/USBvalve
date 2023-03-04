@@ -1,7 +1,7 @@
 # USBvalve
 *Expose USB activity on the fly*
 
-<img src="https://github.com/cecio/USBvalve/blob/main/pictures/versions.png" alt="The two models" />
+<img src="https://github.com/cecio/USBvalve/blob/main/pictures/versions.png" alt="The two models" width="30%" height="30%" />
 
 I'm sure that, like me, you were asked to put your USB drive in an *unknown* device...and then the doubt: 
 
@@ -9,10 +9,10 @@ what happened to my  poor dongle, behind the scene? Stealing my files? Encryptin
 
 With **USBvalve** you can have an immediate feedback about what happen to the drive: the screen will show you if the *fake* filesystem built on the device is accessed, read or written:
 
-FIXME some pics
-
-<img src="https://github.com/cecio/USBvalve/blob/main/pictures/selftest.png" alt="Selftest" style="zoom:35%;" />
-
+<p float="left">
+<img src="https://github.com/cecio/USBvalve/blob/main/pictures/selftest.png" alt="Selftest" width="15%" height="15%" />
+<img src="https://github.com/cecio/USBvalve/blob/main/pictures/readme.png" alt="Readme" width="15%" height="15%" />
+</p>
 
 ## Repository Structure
 
@@ -30,8 +30,6 @@ FIXME some pics
 
 ## Build USBvalve
 
-FIXME: two usbs
-
 ### Part list
 
 If you want to build your own, you need:
@@ -45,11 +43,13 @@ If you want to build your own, you need:
 
 Almost all the job is done directly on the board by the software, so you just need to arrange the connection with the OLED for output
 
-FIXME pico_pinout
-
 #### With USBvalve PCB
 
-FIXME pics of the two sides of the PCB
+<p float="left">
+  <img src="https://github.com/cecio/USBvalve/blob/main/pictures/USB_valve_front.png" width="25%" height="25%" />
+  <img src="https://github.com/cecio/USBvalve/blob/main/pictures/USB_valve_back.png" width="25%" height="523" /> 
+</p>
+
 
 - place the Raspberry Pi Pico on the silk screen on the front 
 - you don't need to solder all the PINs. Just the following:
@@ -64,17 +64,19 @@ Some of the OLEDs have the GND and VCC PINs swapped, so I built the PCB to be co
 
 For example if your OLED has GND on PIN1 and VCC on PIN2 like this:
 
-FIXME picture
+<img src="https://github.com/cecio/USBvalve/blob/main/pictures/usb_valve_oled.png" width="35%" height="35%" />
 
 You have to place a blob of solder on these two pads on the back of the PCB:
 
-FIXME picture
+<img src="https://github.com/cecio/USBvalve/blob/main/pictures/usb_valve_pads.png" width="15%" height="15%" />
 
 Otherwise you should the opposite and place the solder on the other PADs:
 
-FIXME picture
+<img src="https://github.com/cecio/USBvalve/blob/main/pictures/usb_valve_pads_2.png" width="15%" height="15%" />
 
 #### Without USBvalve PCB
+
+<img src="https://github.com/cecio/USBvalve/blob/main/pictures/pico-pinout.svg" alt="Pico Pi" width="85%" height="85%" />
 
 If you are using a breadboard or just wiring, all you have to do is to ensure to connect the proper PINs at the OLED screen.
 
