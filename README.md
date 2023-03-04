@@ -7,7 +7,7 @@ I'm sure that, like me, you were asked to put your USB drive in an *unknown* dev
 
 what happened to my  poor dongle, behind the scene? Stealing my files? Encrypting them? Or  *just* installing a malware? With **USBvalve** you can spot this out in  seconds: built on super cheap off-the-shelf hardware you can quickly  test any USB file system activity and understand what is going on before it's too late!
 
-With **USBvalve** you can have an immediate feedback about what happen to the drive: the screen will show you if the *fake* filesystem built on the device is accessed, read or written:
+With **USBvalve** you can have an immediate feedback about what happen to the drive; the screen will show you if the *fake* filesystem built on the device is accessed, read or written:
 
 <p float="left">
 <img src="https://github.com/cecio/USBvalve/blob/main/pictures/selftest.png" alt="Selftest" width="15%" height="15%" />
