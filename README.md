@@ -9,9 +9,8 @@ With **USBvalve** you can have an immediate feedback about what happen to the dr
 
 FIXME some pics
 
-```
 <img src="https://github.com/cecio/USBvalve/blob/main/pictures/selftest.png" alt="ghidra_main" style="zoom:75%;" />
-```
+
 
 ## Repository Structure
 
