@@ -106,7 +106,7 @@ It's done!
 Obviously you can also build your own firmware. To build the *standard* one I used:
 
 - Arduino IDE 2.0.4
-- as board I used `Arduino MBED OS RP2040` version `4.0.2`
+- as board I used `Raspberry Pi Pico - Arduino MBED OS RP2040` version `4.0.2`
 - `Adafruit TinyUSB Library` version `1.14.4`. Newer versions are not working because the RPI SDK of the board is stick to an older version.  May be migrate the entire project directly on Raspberry Pi Pico SDK is the solution here.
 - `ssd1306` OLED library version `1.8.3`
 
