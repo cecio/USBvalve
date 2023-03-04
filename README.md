@@ -47,7 +47,7 @@ Almost all the job is done directly on the board by the software, so you just ne
 
 <p float="left">
   <img src="https://github.com/cecio/USBvalve/blob/main/pictures/USB_valve_front.png" width="25%" height="25%" />
-  <img src="https://github.com/cecio/USBvalve/blob/main/pictures/USB_valve_back.png" width="25%" height="523" /> 
+  <img src="https://github.com/cecio/USBvalve/blob/main/pictures/USB_valve_back.png" width="25%" height="25%" /> 
 </p>
 
 
