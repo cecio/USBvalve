@@ -22,7 +22,7 @@ With **USBvalve** you can have an immediate feedback about what happen to the dr
 
 `PCB`: Gerber file if you want to print the custom PCB . It's not mandatory, you can use your own or build it on a breadboard
 
-`src`: sources, if you want to modify and build the firmware by yourself
+`USBvalve`: sources, if you want to modify and build the firmware by yourself
 
 `utils`: some utilities you may use to build a custom FS
 
