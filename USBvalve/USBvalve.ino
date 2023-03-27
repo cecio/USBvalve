@@ -54,7 +54,7 @@ bool activeState = false;
 //
 // USBvalve globals
 //
-#define VERSION "USBvalve - 0.6.2"
+#define VERSION "USBvalve - 0.7.0B"
 boolean readme = false;
 boolean autorun = false;
 boolean written = false;
@@ -64,53 +64,25 @@ int x = 2;
 #define BLOCK_AUTORUN 102       // Block where Autorun.inf file is saved
 #define BLOCK_README 100        // Block where README.txt file is saved
 #define MAX_DUMP_BYTES 16       // Used by the dump of the debug facility: do not increase this too much
-#define BYTES_TO_HASH 512 * 10  // Number of bytes of the RAM disk used to check consistency (first 10 blocks)
+#define BYTES_TO_HASH 512 * 2   // Number of bytes of the RAM disk used to check consistency
+#define BYTES_TO_HASH_OFFSET 7  // Starting sector to check for consistency (FAT_DIRECTORY is 7) 
 
 // Burned hash to check consistency
 u8 valid_hash[WIDTH] = {
-  0x44, 0x3B, 0xB1, 0x03, 0x2F, 0x67, 0x47, 0x83,
-  0x81, 0xFA, 0x3D, 0x04, 0x4B, 0x9D, 0x24, 0xCD,
-  0x82, 0x48, 0x7D, 0x21, 0x6E, 0x16, 0x45, 0x43,
-  0x45, 0x05, 0xF6, 0xDF, 0x02, 0x9A, 0x62, 0x1A,
-  0x26, 0x81, 0xF2, 0xB5, 0xED, 0xEC, 0x38, 0x07,
-  0x2A, 0x1F, 0xAF, 0x5A, 0x95, 0x0D, 0x14, 0xE4
+  0x35, 0x98, 0x95, 0x97, 0xC7, 0x70, 0xD3, 0xE4,
+  0xDD, 0x84, 0x71, 0x1D, 0x55, 0xD2, 0xE5, 0xA4,
+  0x6C, 0x28, 0x84, 0xF6, 0xE1, 0x02, 0xD1, 0x74,
+  0x2F, 0xE9, 0x92, 0xAD, 0xAD, 0x74, 0x71, 0xF0,
+  0x37, 0xFF, 0x79, 0x39, 0xDC, 0x20, 0x56, 0x26,
+  0xFE, 0xC7, 0x9A, 0x4E, 0x3A, 0x27, 0x65, 0x81
 };
 
 u8 computed_hash[WIDTH] = { 0x00 };
 
+// Core 0 Setup
 void setup() {
-  // Screen Init
-  Wire.begin();
-  Wire.setClock(400000L);
-#if OLED_HEIGHT == 64
-#if RST_PIN >= 0
-  oled.begin(&Adafruit128x64, I2C_ADDRESS, RST_PIN);
-#else
-  oled.begin(&Adafruit128x64, I2C_ADDRESS);
-#endif
-#else
-#if RST_PIN >= 0
-  oled.begin(&Adafruit128x32, I2C_ADDRESS, RST_PIN);
-#else
-  oled.begin(&Adafruit128x32, I2C_ADDRESS);
-#endif
-#endif
-
-  oled.setFont(Adafruit5x7);
-  cls();  // Clear display
-
   // Check consistency of RAM FS
-  quark(computed_hash, msc_disk[0], BYTES_TO_HASH);
-  if (memcmp(computed_hash, valid_hash, WIDTH) == 0) {
-    oled.println("[+] Selftest: OK");
-    x++;
-  } else {
-    oled.println("[!] Selftest: KO");
-    oled.println("[!] Stopping...");
-    while (1) {
-      delay(1000);  // Loop forever
-    }
-  }
+  quark(computed_hash, msc_disk[BYTES_TO_HASH_OFFSET], BYTES_TO_HASH);
 
 #if defined(ARDUINO_ARCH_MBED) && defined(ARDUINO_ARCH_RP2040)
   // Manual begin() is required on core without built-in support for TinyUSB such as
@@ -136,9 +108,40 @@ void setup() {
 #endif
 
   usb_msc.begin();
+
+  // Screen Init
+  Wire.begin();
+  Wire.setClock(400000L);
+#if OLED_HEIGHT == 64
+#if RST_PIN >= 0
+  oled.begin(&Adafruit128x64, I2C_ADDRESS, RST_PIN);
+#else
+  oled.begin(&Adafruit128x64, I2C_ADDRESS);
+#endif
+#else
+#if RST_PIN >= 0
+  oled.begin(&Adafruit128x32, I2C_ADDRESS, RST_PIN);
+#else
+  oled.begin(&Adafruit128x32, I2C_ADDRESS);
+#endif
+#endif
+
+  oled.setFont(Adafruit5x7);
+  cls();  // Clear display
+
+  if (memcmp(computed_hash, valid_hash, WIDTH) == 0) {
+    oled.println("[+] Selftest: OK");
+    x++;
+  } else {
+    oled.println("[!] Selftest: KO");
+    oled.println("[!] Stopping...");
+    while (1) {
+      delay(1000);  // Loop forever
+    }
+  }
 }
 
-// Main loop, managing display
+// Main Core0 loop, managing display
 void loop() {
 
   if (readme == true) {
@@ -206,7 +209,7 @@ int32_t msc_read_callback(uint32_t lba, void* buffer, uint32_t bufsize) {
 int32_t msc_write_callback(uint32_t lba, uint8_t* buffer, uint32_t bufsize) {
 
   // This check for writing of space. The LBA > 10 is set to avoid some
-  // false positives
+  // false positives, in particular on Windows Systems
   if (lba > 10) {
     written = true;
   }
