@@ -106,8 +106,9 @@ It's done!
 Obviously you can also build your own firmware. To build the *standard* one I used:
 
 - Arduino IDE 2.0.4
-- as board I used `Raspberry Pi Pico - Arduino MBED OS RP2040` version `4.0.2`
-- `Adafruit TinyUSB Library` version `1.14.4`. Newer versions are not working because the RPI SDK of the board is stick to an older version.  May be migrate the entire project directly on Raspberry Pi Pico SDK is the solution here.
+- ~~as board I used `Raspberry Pi Pico - Arduino MBED OS RP2040` version `4.0.2`~~
+- ~~`Adafruit TinyUSB Library` version `1.14.4`. Newer versions are not working because the RPI SDK of the board is stick to an older version.  May be migrate the entire project directly on Raspberry Pi Pico SDK is the solution here.~~
+- from version `0.7.0` I used `Adafruit TinyUSB Library` version `2.0.1` and Board `Raspberry Pi RP2040 (2.7.0)`
 - `ssd1306` OLED library version `1.8.3`
 
 If you want to re-create a new fake filesystem, you may want to have a look to the `utils` folder, where I placed some utilities to build a new one.
