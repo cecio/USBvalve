@@ -26,7 +26,7 @@ With **USBvalve** you can have an immediate feedback about what happen to the dr
 
 `utils`: some utilities you may use to build a custom FS
 
-`pitcures`: images and resources used in this doc
+`pictures`: images and resources used in this doc
 
 ## Build USBvalve
 
