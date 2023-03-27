@@ -2,7 +2,7 @@
   USBvalve
   
   written by Cesare Pizzi
-  This project extensively reuse code doen by Adafruit. Please support them!
+  This project extensively reuse code done by Adafruit. Please support them!
 */
 
 /*********************************************************************
@@ -54,7 +54,7 @@ bool activeState = false;
 //
 // USBvalve globals
 //
-#define VERSION "USBvalve - 0.7.0B"
+#define VERSION "USBvalve - 0.7.0"
 boolean readme = false;
 boolean autorun = false;
 boolean written = false;
