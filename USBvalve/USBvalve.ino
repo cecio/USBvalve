@@ -16,8 +16,28 @@
   any redistribution
 *********************************************************************/
 
+#include <pio_usb.h>
 #include "Adafruit_TinyUSB.h"
 #include "SSD1306AsciiWire.h"
+
+//
+// BADUSB detector section
+//
+
+/*
+ * Requirements:
+ * - [Pico-PIO-USB](https://github.com/sekigon-gonnoc/Pico-PIO-USB) library
+ * - 2 consecutive GPIOs: D+ is defined by HOST_PIN_DP (gpio2), D- = D+ +1 (gpio3)
+ * - CPU Speed must be either 120 or 240 Mhz. Selected via "Menu -> CPU Speed"
+ */
+
+#define HOST_PIN_DP 14      // Pin used as D+ for host, D- = D+ + 1
+#define LANGUAGE_ID 0x0409  // English
+
+// USB Host object
+Adafruit_USBH_Host USBHost;
+
+// END of BADUSB detector section
 
 // Define vars for OLED screen
 #define I2C_ADDRESS 0x3C  // 0X3C+SA0 - 0x3C or 0x3D
@@ -54,7 +74,7 @@ bool activeState = false;
 //
 // USBvalve globals
 //
-#define VERSION "USBvalve - 0.7.0"
+#define VERSION "USBvalve - 0.8.0B"
 boolean readme = false;
 boolean autorun = false;
 boolean written = false;
@@ -65,7 +85,7 @@ int x = 2;
 #define BLOCK_README 100        // Block where README.txt file is saved
 #define MAX_DUMP_BYTES 16       // Used by the dump of the debug facility: do not increase this too much
 #define BYTES_TO_HASH 512 * 2   // Number of bytes of the RAM disk used to check consistency
-#define BYTES_TO_HASH_OFFSET 7  // Starting sector to check for consistency (FAT_DIRECTORY is 7) 
+#define BYTES_TO_HASH_OFFSET 7  // Starting sector to check for consistency (FAT_DIRECTORY is 7)
 
 // Burned hash to check consistency
 u8 valid_hash[WIDTH] = {
@@ -79,7 +99,7 @@ u8 valid_hash[WIDTH] = {
 
 u8 computed_hash[WIDTH] = { 0x00 };
 
-// Core 0 Setup
+// Core 0 Setup: will be used for the USB mass device functions
 void setup() {
   // Check consistency of RAM FS
   quark(computed_hash, msc_disk[BYTES_TO_HASH_OFFSET], BYTES_TO_HASH);
@@ -141,7 +161,21 @@ void setup() {
   }
 }
 
-// Main Core0 loop, managing display
+// Core 1 Setup: will be used for the USB host functions for BADUSB detector
+void setup1() {
+  //while ( !Serial ) delay(10);   // wait for native usb
+
+  pio_usb_configuration_t pio_cfg = PIO_USB_DEFAULT_CONFIG;
+  pio_cfg.pin_dp = HOST_PIN_DP;
+  USBHost.configure_pio_usb(1, &pio_cfg);
+
+  // run host stack on controller (rhport) 1
+  // Note: For rp2040 pico-pio-usb, calling USBHost.begin() on core1 will have most of the
+  // host bit-banging processing works done in core1
+  USBHost.begin(1);
+}
+
+// Main Core0 loop: managing display
 void loop() {
 
   if (readme == true) {
@@ -165,6 +199,11 @@ void loop() {
     written = false;
     written_reported = true;
   }
+}
+
+// Main Core1 loop: managing USB Host
+void loop1() {
+  USBHost.task();
 }
 
 // Callback invoked when received READ10 command.
@@ -290,3 +329,53 @@ void hexDump(unsigned char* data, size_t size) {
   }
   SerialTinyUSB.println();
 }
+
+//
+// BADUSB detector section
+//
+
+// Invoked when device with hid interface is mounted
+// Report descriptor is also available for use.
+// tuh_hid_parse_report_descriptor() can be used to parse common/simple enough
+// descriptor. Note: if report descriptor length > CFG_TUH_ENUMERATION_BUFSIZE,
+// it will be skipped therefore report_desc = NULL, desc_len = 0
+void tuh_hid_mount_cb(uint8_t dev_addr, uint8_t instance, uint8_t const* desc_report, uint16_t desc_len) {
+  (void)desc_report;
+  (void)desc_len;
+  uint16_t vid, pid;
+  tuh_vid_pid_get(dev_addr, &vid, &pid);
+
+  if (x == OLED_LINES) cls();
+  oled.println("[++] HID Device");
+  x++;
+
+  SerialTinyUSB.printf("HID device address = %d, instance = %d mounted\r\n", dev_addr, instance);
+  SerialTinyUSB.printf("VID = %04x, PID = %04x\r\n", vid, pid);
+  if (!tuh_hid_receive_report(dev_addr, instance)) {
+    SerialTinyUSB.printf("Error: cannot request to receive report\r\n");
+  }
+}
+
+// Invoked when device with hid interface is un-mounted
+void tuh_hid_umount_cb(uint8_t dev_addr, uint8_t instance) {
+  SerialTinyUSB.printf("HID device address = %d, instance = %d unmounted\r\n", dev_addr, instance);
+}
+
+// Invoked when received report from device via interrupt endpoint
+void tuh_hid_report_received_cb(uint8_t dev_addr, uint8_t instance, uint8_t const* report, uint16_t len) {
+  if (x == OLED_LINES) cls();
+  oled.println("[!!] HID Sending data");
+  x++;
+
+  SerialTinyUSB.printf("HIDreport : ");
+  for (uint16_t i = 0; i < len; i++) {
+    SerialTinyUSB.printf("0x%02X ", report[i]);
+  }
+  SerialTinyUSB.println();
+  // continue to request to receive report
+  if (!tuh_hid_receive_report(dev_addr, instance)) {
+    SerialTinyUSB.printf("Error: cannot request to receive report\r\n");
+  }
+}
+
+// END of BADUSB detector section
