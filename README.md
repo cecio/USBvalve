@@ -13,6 +13,12 @@ With **USBvalve** you can have an immediate feedback about what happen to the dr
 <img src="https://github.com/cecio/USBvalve/blob/main/pictures/selftest.png" alt="Selftest" width="15%" height="15%" />
 <img src="https://github.com/cecio/USBvalve/blob/main/pictures/readme.png" alt="Readme" width="15%" height="15%" />
 </p>
+and from version `0.8.0` you can also use it as USB Host to detect *BADUSB* devices:
+
+<p float="left">
+<img src="https://github.com/cecio/USBvalve/blob/main/pictures/hid.png" alt="HID" width="15%" height="15%" />
+</p>
+
 
 ## Repository Structure
 
@@ -41,24 +47,31 @@ If you want to build your own, you need:
 
 ### Building instructions
 
-Almost all the job is done directly on the board by the software, so you just need to arrange the connection with the OLED for output
+Almost all the job is done directly on the board by the software, so you just need to arrange the connection with the OLED for output.
+
+Starting from version 0.8.0 of the firmware, **USBvalve** can detect HID devices (used to detect *BADUSB*). This require an additional USB port behaving as Host. If you are not interested in this, you can use the old instructions [in docs folder](https://github.com/cecio/USBvalve/blob/main/docs/BUILDING-1.1.md) and use PCB version `1.1`. Otherwise go ahead with PCB version `1.2` (we have version for USB-A or USB-B, see folder).
 
 #### With USBvalve PCB
 
 <p float="left">
-  <img src="https://github.com/cecio/USBvalve/blob/main/pictures/USB_valve_front.png" width="25%" height="25%" />
-  <img src="https://github.com/cecio/USBvalve/blob/main/pictures/USB_valve_back.png" width="25%" height="25%" /> 
+  <img src="https://github.com/cecio/USBvalve/blob/main/pictures/USB_valve_1-2_front.png" width="25%" height="25%" />
+  <img src="https://github.com/cecio/USBvalve/blob/main/pictures/USB_valve_1-2_back.png" width="25%" height="25%" /> 
 </p>
+
 
 
 - place the Raspberry Pi Pico on the silk screen on the front 
 - you don't need to solder all the PINs. Just the following:
   - D4 and D5 (left side)
-  - GND (right side)
+  - D14 and D15 (left side)
+  - GND (right side, third pin from the top)
+  - GND (right side, third pin from the bottom)
   - 3v3_OUT (right side)
+  - VBUS (right side)
   - the 3 DEBUG pin on the bottom: SWCLK, GND and SWDIO
 - place the 3D printer spacer or a piece of tape on the parts of the OLED that my touch the Raspberry
 - solder the OLED (with a header) on the 4 PIN space
+- solder a USB female port in `USBH` area. This is for version `A`, but there is a version for USB `Micro-B` as well if you prefer
 
 Some of the OLEDs have the GND and VCC PINs swapped, so I built the PCB to be compatible with both versions: 
 
@@ -78,14 +91,18 @@ Otherwise you should the opposite and place the solder on the other PADs:
 
 <img src="https://github.com/cecio/USBvalve/blob/main/pictures/pico-pinout.svg" alt="Pico Pi" width="85%" height="85%" />
 
-If you are using a breadboard or just wiring, all you have to do is to ensure to connect the proper PINs at the OLED screen.
+If you are using a breadboard or just wiring, all you have to do is to ensure to connect the proper PINs at the OLED screen and to the Host USB port.
 
 The mapping is the following:
 
 - PIN6 of Pi --> OLED SDA
 - PIN7 of Pi --> OLED SCL 
+- PIN19 of Pi --> D+ of USB Host
+- PIN20 of Pi --> D- of USB Host
+- PIN23 (GND) of Pi --> GND of USB Host
 - PIN38 (GND) of Pi --> OLED GND
 - PIN36 (3V3OUT) of Pi --> OLED VCC
+- PIN40 (VBUS) of Pi --> VCC of USB Host
 
 If you want to use the DEBUG functions, you can also place a header on the 3 SWD PINs at the bottom of the board.
 
@@ -105,10 +122,10 @@ It's done!
 
 Obviously you can also build your own firmware. To build the *standard* one I used:
 
-- Arduino IDE 2.0.4
+- Arduino IDE 2.1.0
 - ~~as board I used `Raspberry Pi Pico - Arduino MBED OS RP2040` version `4.0.2`~~
 - ~~`Adafruit TinyUSB Library` version `1.14.4`. Newer versions are not working because the RPI SDK of the board is stick to an older version.  May be migrate the entire project directly on Raspberry Pi Pico SDK is the solution here.~~
-- from version `0.7.0` I used `Adafruit TinyUSB Library` version `2.0.1` and Board `Raspberry Pi RP2040 (2.7.0)`
+- from version `0.7.0` I used `Adafruit TinyUSB Library` version `2.1.0` and Board `Raspberry Pi RP2040 (2.7.0)`
 - `ssd1306` OLED library version `1.8.3`
 
 If you want to re-create a new fake filesystem, you may want to have a look to the `utils` folder, where I placed some utilities to build a new one.
