@@ -13,6 +13,7 @@ With **USBvalve** you can have an immediate feedback about what happen to the dr
 <img src="https://github.com/cecio/USBvalve/blob/main/pictures/selftest.png" alt="Selftest" width="15%" height="15%" />
 <img src="https://github.com/cecio/USBvalve/blob/main/pictures/readme.png" alt="Readme" width="15%" height="15%" />
 </p>
+
 and from version `0.8.0` you can also use it as USB Host to detect *BADUSB* devices:
 
 <p float="left">
@@ -55,7 +56,7 @@ Starting from version 0.8.0 of the firmware, **USBvalve** can detect HID devices
 
 <p float="left">
   <img src="https://github.com/cecio/USBvalve/blob/main/pictures/USB_valve_1-2_front.png" width="25%" height="25%" />
-  <img src="https://github.com/cecio/USBvalve/blob/main/pictures/USB_valve_1-2_back.png" width="25%" height="25%" /> 
+  <img src="https://github.com/cecio/USBvalve/blob/main/pictures/USB_valve_1-2_back.png" width="24%" height="24%" /> 
 </p>
 
 
