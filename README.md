@@ -35,6 +35,8 @@ and from version `0.8.0` you can also use it as USB Host to detect *BADUSB* devi
 
 `pictures`: images and resources used in this doc
 
+`STL`: STL files for enclosure
+
 ## Build USBvalve
 
 ### Part list
