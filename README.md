@@ -26,6 +26,8 @@ This is an example of the *BADUSB* debugger available on serial port:
 <a href="https://asciinema.org/a/wuRANSFnFuyg9Fpxv5yoTCTuH" target="_blank"><img src="https://asciinema.org/a/wuRANSFnFuyg9Fpxv5yoTCTuH.svg" width="65%" height="65%" /></a>
 </p>
 
+If you prefer videos, you can also have a look to my [Insomni'hack Presentation](https://www.youtube.com/watch?v=jy1filtQY4w)
+
 ## Repository Structure
 
 `docs`: documentation about the project, with a presentation where you can have a look to all the features
