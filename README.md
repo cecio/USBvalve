@@ -20,6 +20,11 @@ and from version `0.8.0` you can also use it as USB Host to detect *BADUSB* devi
 <img src="https://github.com/cecio/USBvalve/blob/main/pictures/hid.png" alt="HID" width="15%" height="15%" />
 </p>
 
+This is an example of the *BADUSB* debugger available on serial port:
+
+<p float="left">
+<a href="https://asciinema.org/a/wuRANSFnFuyg9Fpxv5yoTCTuH" target="_blank"><img src="https://asciinema.org/a/wuRANSFnFuyg9Fpxv5yoTCTuH.svg" width="65%" height="65%" /></a>
+</p>
 
 ## Repository Structure
 
