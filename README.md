@@ -62,7 +62,7 @@ Starting from version 0.8.0 of the firmware, **USBvalve** can detect HID devices
 </p>
 
 
-
+- solder a USB female port in `USBH` area. This is for version `A`, but there is a version for USB `Micro-B` as well if you prefer
 - place the Raspberry Pi Pico on the silk screen on the front 
 - you don't need to solder all the PINs. Just the following:
   - D4 and D5 (left side)
@@ -74,7 +74,6 @@ Starting from version 0.8.0 of the firmware, **USBvalve** can detect HID devices
   - the 3 DEBUG pin on the bottom: SWCLK, GND and SWDIO
 - place the 3D printer spacer or a piece of tape on the parts of the OLED that my touch the Raspberry
 - solder the OLED (with a header) on the 4 PIN space
-- solder a USB female port in `USBH` area. This is for version `A`, but there is a version for USB `Micro-B` as well if you prefer
 
 Some of the OLEDs have the GND and VCC PINs swapped, so I built the PCB to be compatible with both versions: 
 
