@@ -23,7 +23,7 @@ and from version `0.8.0` you can also use it as USB Host to detect *BADUSB* devi
 This is an example of the *BADUSB* debugger available on serial port:
 
 <p float="left">
-<a href="https://asciinema.org/a/wuRANSFnFuyg9Fpxv5yoTCTuH" target="_blank"><img src="https://asciinema.org/a/wuRANSFnFuyg9Fpxv5yoTCTuH.svg" width="65%" height="65%" /></a>
+<a href="https://asciinema.org/a/NWfC9Mvzzpj3eZfsC7s5Dz1sJ" target="_blank"><img src="https://asciinema.org/a/NWfC9Mvzzpj3eZfsC7s5Dz1sJ.svg" width="65%" height="65%" /></a>
 </p>
 
 If you prefer videos, you can also have a look to my [Insomni'hack Presentation](https://www.youtube.com/watch?v=jy1filtQY4w)
@@ -134,10 +134,9 @@ Obviously you can also build your own firmware. To build the *standard* one I us
 - Arduino IDE 2.1.0
 - ~~as board I used `Raspberry Pi Pico - Arduino MBED OS RP2040` version `4.0.2`~~
 - ~~`Adafruit TinyUSB Library` version `1.14.4`. Newer versions are not working because the RPI SDK of the board is stick to an older version.  May be migrate the entire project directly on Raspberry Pi Pico SDK is the solution here.~~
-- from version `0.7.0` I used `Adafruit TinyUSB Library` version `2.1.0` and Board `Raspberry Pi RP2040 (2.7.0)`
+- `Adafruit TinyUSB Library` version `2.2.0` and Board `Raspberry Pi RP2040 (2.7.0)` setting clock at 240MHz (overclock)
 - `ssd1306` OLED library version `1.8.3`
 
 If you want to re-create a new fake filesystem, you may want to have a look to the `utils` folder, where I placed some utilities to build a new one.
 
 **NOTE**: if you have ideas or improvements in your mind, I encourage you to open an issue so that we can improve the project together! Thanks!
-

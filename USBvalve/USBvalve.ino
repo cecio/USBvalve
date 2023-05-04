@@ -2,7 +2,7 @@
   USBvalve
   
   written by Cesare Pizzi
-  This project extensively reuse code done by Adafruit. Please support them!
+  This project extensively reuse code done by Adafruit and TinyUSB. Please support them!
 */
 
 /*********************************************************************
@@ -42,7 +42,7 @@ Adafruit_USBH_Host USBHost;
 // Define vars for OLED screen
 #define I2C_ADDRESS 0x3C  // 0X3C+SA0 - 0x3C or 0x3D
 #define RST_PIN -1        // Define proper RST_PIN if required.
-#define OLED_HEIGHT 64    // 64 or 32 depending on the OLED
+#define OLED_HEIGHT 32    // 64 or 32 depending on the OLED
 #define OLED_LINES (OLED_HEIGHT / 8)
 SSD1306AsciiWire oled;
 
@@ -74,7 +74,7 @@ bool activeState = false;
 //
 // USBvalve globals
 //
-#define VERSION "USBvalve - 0.8.1"
+#define VERSION "USBvalve - 0.9.0b"
 boolean readme = false;
 boolean autorun = false;
 boolean written = false;
@@ -334,15 +334,16 @@ void hexDump(unsigned char* data, size_t size) {
 // BADUSB detector section
 //
 
+static uint8_t const keycode2ascii[128][2] = { HID_KEYCODE_TO_ASCII };
+
 // Invoked when device with hid interface is mounted
-// Report descriptor is also available for use.
-// tuh_hid_parse_report_descriptor() can be used to parse common/simple enough
-// descriptor. Note: if report descriptor length > CFG_TUH_ENUMERATION_BUFSIZE,
-// it will be skipped therefore report_desc = NULL, desc_len = 0
 void tuh_hid_mount_cb(uint8_t dev_addr, uint8_t instance, uint8_t const* desc_report, uint16_t desc_len) {
-  (void)desc_report;
-  (void)desc_len;
   uint16_t vid, pid;
+  const char* protocol_str[] = { "None", "Keyboard", "Mouse" };
+
+  // Read the HID protocol
+  uint8_t const itf_protocol = tuh_hid_interface_protocol(dev_addr, instance);
+
   tuh_vid_pid_get(dev_addr, &vid, &pid);
 
   if (x == OLED_LINES) cls();
@@ -351,6 +352,8 @@ void tuh_hid_mount_cb(uint8_t dev_addr, uint8_t instance, uint8_t const* desc_re
 
   SerialTinyUSB.printf("HID device address = %d, instance = %d mounted\r\n", dev_addr, instance);
   SerialTinyUSB.printf("VID = %04x, PID = %04x\r\n", vid, pid);
+  SerialTinyUSB.printf("HID Interface Protocol = %s\r\n", protocol_str[itf_protocol]);
+
   if (!tuh_hid_receive_report(dev_addr, instance)) {
     SerialTinyUSB.printf("Error: cannot request to receive report\r\n");
   }
@@ -361,21 +364,141 @@ void tuh_hid_umount_cb(uint8_t dev_addr, uint8_t instance) {
   SerialTinyUSB.printf("HID device address = %d, instance = %d unmounted\r\n", dev_addr, instance);
 }
 
-// Invoked when received report from device via interrupt endpoint
+// Invoked when received report from device
 void tuh_hid_report_received_cb(uint8_t dev_addr, uint8_t instance, uint8_t const* report, uint16_t len) {
+
+  static bool kbd_printed = false;
+  static bool mouse_printed = false;
+
   if (x == OLED_LINES) cls();
   oled.println("[!!] HID Sending data");
   x++;
 
-  SerialTinyUSB.printf("HIDreport : ");
-  for (uint16_t i = 0; i < len; i++) {
-    SerialTinyUSB.printf("0x%02X ", report[i]);
+  // Read the HID protocol
+  uint8_t const itf_protocol = tuh_hid_interface_protocol(dev_addr, instance);
+
+  switch (itf_protocol) {
+    case HID_ITF_PROTOCOL_KEYBOARD:
+      if (kbd_printed == false) {
+        SerialTinyUSB.println("HID received keyboard report");
+        kbd_printed = true;
+        mouse_printed = false;
+      }
+      process_kbd_report((hid_keyboard_report_t const*)report);
+      break;
+
+    case HID_ITF_PROTOCOL_MOUSE:
+      if (kbd_printed == false) {
+        SerialTinyUSB.println("HID receive mouse report");
+        mouse_printed = true;
+        kbd_printed = false;
+      }
+      process_mouse_report( (hid_mouse_report_t const*) report );
+      break;
+
+    default:
+      // Generic report: for the time being we use kbd for this as well
+      process_kbd_report((hid_keyboard_report_t const*)report);
+      break;
   }
-  SerialTinyUSB.println();
-  // continue to request to receive report
+
   if (!tuh_hid_receive_report(dev_addr, instance)) {
-    SerialTinyUSB.printf("Error: cannot request to receive report\r\n");
+    SerialTinyUSB.println("Error: cannot request to receive report");
   }
 }
+
+static inline bool find_key_in_report(hid_keyboard_report_t const* report, uint8_t keycode) {
+  for (uint8_t i = 0; i < 6; i++) {
+    if (report->keycode[i] == keycode) return true;
+  }
+
+  return false;
+}
+
+static void process_kbd_report(hid_keyboard_report_t const* report) {
+  // previous report to check key released
+  static hid_keyboard_report_t prev_report = { 0, 0, { 0 } };
+
+  for (uint8_t i = 0; i < 6; i++) {
+    if (report->keycode[i]) {
+      if (find_key_in_report(&prev_report, report->keycode[i])) {
+        // Exist in previous report means the current key is holding
+      } else {
+        // Not existed in previous report means the current key is pressed
+
+        // Check for modifiers. It looks that in specific cases, they are not correctly recognized (probably
+        // for timing issues in fast input)
+        bool const is_shift = report->modifier & (KEYBOARD_MODIFIER_LEFTSHIFT | KEYBOARD_MODIFIER_RIGHTSHIFT);
+        uint8_t ch = keycode2ascii[report->keycode[i]][is_shift ? 1 : 0];
+
+        bool const is_gui = report->modifier & (KEYBOARD_MODIFIER_LEFTGUI | KEYBOARD_MODIFIER_RIGHTGUI);
+        if (is_gui == true) SerialTinyUSB.printf("GUI+");
+
+        bool const is_alt = report->modifier & (KEYBOARD_MODIFIER_LEFTALT | KEYBOARD_MODIFIER_RIGHTALT);
+        if (is_alt == true) SerialTinyUSB.printf("ALT+");
+
+        // Check for "special" keys
+        check_special_key(report->keycode[i]);
+
+        // Finally, print out the decoded char
+        SerialTinyUSB.printf("%c", ch);
+        if (ch == '\r') SerialTinyUSB.print("\n");  // New line for enter
+
+        fflush(stdout);  // flush right away, else nanolib will wait for newline
+      }
+    }
+  }
+
+  prev_report = *report;
+}
+
+static void check_special_key(uint8_t code) {
+
+  if (code == HID_KEY_ARROW_RIGHT) SerialTinyUSB.print("<ARROWRIGHT>");
+  if (code == HID_KEY_ARROW_LEFT) SerialTinyUSB.print("<ARROWLEFT>");
+  if (code == HID_KEY_ARROW_DOWN) SerialTinyUSB.print("<ARROWDOWN>");
+  if (code == HID_KEY_ARROW_UP) SerialTinyUSB.print("<ARROWUP>");
+  if (code == HID_KEY_HOME) SerialTinyUSB.print("<HOME>");
+  if (code == HID_KEY_KEYPAD_1) SerialTinyUSB.print("<KEYPAD_1>");
+  if (code == HID_KEY_KEYPAD_2) SerialTinyUSB.print("<KEYPAD_2>");
+  if (code == HID_KEY_KEYPAD_3) SerialTinyUSB.print("<KEYPAD_3>");
+  if (code == HID_KEY_KEYPAD_4) SerialTinyUSB.print("<KEYPAD_4>");
+  if (code == HID_KEY_KEYPAD_5) SerialTinyUSB.print("<KEYPAD_5>");
+  if (code == HID_KEY_KEYPAD_6) SerialTinyUSB.print("<KEYPAD_6>");
+  if (code == HID_KEY_KEYPAD_7) SerialTinyUSB.print("<KEYPAD_7>");
+  if (code == HID_KEY_KEYPAD_8) SerialTinyUSB.print("<KEYPAD_8>");
+  if (code == HID_KEY_KEYPAD_9) SerialTinyUSB.print("<KEYPAD_9>");
+  if (code == HID_KEY_KEYPAD_0) SerialTinyUSB.print("<KEYPAD_0>");
+  if (code == HID_KEY_F1) SerialTinyUSB.print("<F1>");
+  if (code == HID_KEY_F2) SerialTinyUSB.print("<F2>");
+  if (code == HID_KEY_F3) SerialTinyUSB.print("<F3>");
+  if (code == HID_KEY_F4) SerialTinyUSB.print("<F4>");
+  if (code == HID_KEY_F5) SerialTinyUSB.print("<F5>");
+  if (code == HID_KEY_F6) SerialTinyUSB.print("<F6>");
+  if (code == HID_KEY_F7) SerialTinyUSB.print("<F7>");
+  if (code == HID_KEY_F8) SerialTinyUSB.print("<F8>");
+  if (code == HID_KEY_F9) SerialTinyUSB.print("<F9>");
+  if (code == HID_KEY_F10) SerialTinyUSB.print("<F10>");
+  if (code == HID_KEY_F11) SerialTinyUSB.print("<F11>");
+  if (code == HID_KEY_F12) SerialTinyUSB.print("<F12>");
+  if (code == HID_KEY_PRINT_SCREEN) SerialTinyUSB.print("<PRNT>");
+  if (code == HID_KEY_SCROLL_LOCK) SerialTinyUSB.print("<SCRLL>");
+  if (code == HID_KEY_PAUSE) SerialTinyUSB.print("<PAUSE>");
+  if (code == HID_KEY_INSERT) SerialTinyUSB.print("<INSERT>");
+  if (code == HID_KEY_PAGE_UP) SerialTinyUSB.print("<PAGEUP>");
+  if (code == HID_KEY_DELETE) SerialTinyUSB.print("<DEL>");
+  if (code == HID_KEY_END) SerialTinyUSB.print("<END>");
+  if (code == HID_KEY_PAGE_DOWN) SerialTinyUSB.print("<PAGEDOWN>");
+  if (code == HID_KEY_NUM_LOCK) SerialTinyUSB.print("<ARROWRIGHT>");
+  if (code == HID_KEY_KEYPAD_DIVIDE) SerialTinyUSB.print("<KEYPAD_DIV>");
+  if (code == HID_KEY_KEYPAD_MULTIPLY) SerialTinyUSB.print("<KEYPAD_MUL>");
+  if (code == HID_KEY_KEYPAD_SUBTRACT) SerialTinyUSB.print("<KEYPAD_SUB>");
+  if (code == HID_KEY_KEYPAD_ADD) SerialTinyUSB.print("<KEYPAD_ADD>");
+  if (code == HID_KEY_KEYPAD_DECIMAL) SerialTinyUSB.print("<KEYPAD_DECIMAL>");
+}
+
+static void process_mouse_report(hid_mouse_report_t const* report) {
+  // TBD: FIXME
+} 
 
 // END of BADUSB detector section
