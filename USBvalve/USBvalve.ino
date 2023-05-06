@@ -393,7 +393,7 @@ void tuh_hid_report_received_cb(uint8_t dev_addr, uint8_t instance, uint8_t cons
         mouse_printed = true;
         kbd_printed = false;
       }
-      process_mouse_report( (hid_mouse_report_t const*) report );
+      process_mouse_report((hid_mouse_report_t const*)report);
       break;
 
     default:
@@ -416,7 +416,7 @@ static inline bool find_key_in_report(hid_keyboard_report_t const* report, uint8
 }
 
 static void process_kbd_report(hid_keyboard_report_t const* report) {
-  // previous report to check key released
+  // Previous report to check key released
   static hid_keyboard_report_t prev_report = { 0, 0, { 0 } };
 
   for (uint8_t i = 0; i < 6; i++) {
@@ -498,7 +498,22 @@ static void check_special_key(uint8_t code) {
 }
 
 static void process_mouse_report(hid_mouse_report_t const* report) {
-  // TBD: FIXME
-} 
+  static hid_mouse_report_t prev_report = { 0 };
+
+  //------------- button state  -------------//
+  uint8_t button_changed_mask = report->buttons ^ prev_report.buttons;
+  if (button_changed_mask & report->buttons) {
+    SerialTinyUSB.printf("MOUSE: %c%c%c ",
+           report->buttons & MOUSE_BUTTON_LEFT ? 'L' : '-',
+           report->buttons & MOUSE_BUTTON_MIDDLE ? 'M' : '-',
+           report->buttons & MOUSE_BUTTON_RIGHT ? 'R' : '-');
+  }
+
+  cursor_movement(report->x, report->y, report->wheel);
+}
+
+void cursor_movement(int8_t x, int8_t y, int8_t wheel) {
+  SerialTinyUSB.printf("(%d %d %d)\r\n", x, y, wheel);
+}
 
 // END of BADUSB detector section
