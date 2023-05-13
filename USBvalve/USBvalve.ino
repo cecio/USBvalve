@@ -42,7 +42,7 @@ Adafruit_USBH_Host USBHost;
 // Define vars for OLED screen
 #define I2C_ADDRESS 0x3C  // 0X3C+SA0 - 0x3C or 0x3D
 #define RST_PIN -1        // Define proper RST_PIN if required.
-#define OLED_HEIGHT 64    // 64 or 32 depending on the OLED
+#define OLED_HEIGHT 32    // 64 or 32 depending on the OLED
 #define OLED_LINES (OLED_HEIGHT / 8)
 SSD1306AsciiWire oled;
 
@@ -74,12 +74,11 @@ bool activeState = false;
 //
 // USBvalve globals
 //
-#define VERSION "USBvalve - 0.9.0"
+#define VERSION "USBvalve - 0.9.1"
 boolean readme = false;
 boolean autorun = false;
 boolean written = false;
 boolean written_reported = false;
-int x = 2;
 
 #define BLOCK_AUTORUN 102       // Block where Autorun.inf file is saved
 #define BLOCK_README 100        // Block where README.txt file is saved
@@ -147,14 +146,14 @@ void setup() {
 #endif
 
   oled.setFont(Adafruit5x7);
+  oled.setScrollMode(SCROLL_MODE_AUTO);
   cls();  // Clear display
 
   if (memcmp(computed_hash, valid_hash, WIDTH) == 0) {
-    oled.println("[+] Selftest: OK");
-    x++;
+    oled.print("\n[+] Selftest: OK");
   } else {
-    oled.println("[!] Selftest: KO");
-    oled.println("[!] Stopping...");
+    oled.print("\n[!] Selftest: KO");
+    oled.print("\n[!] Stopping...");
     while (1) {
       delay(1000);  // Loop forever
     }
@@ -179,23 +178,17 @@ void setup1() {
 void loop() {
 
   if (readme == true) {
-    if (x == OLED_LINES) cls();
-    oled.println("[!] README (R)");
-    x++;
+    oled.print("\n[!] README (R)");
     readme = false;
   }
 
   if (autorun == true) {
-    if (x == OLED_LINES) cls();
-    oled.println("[+] AUTORUN (R)");
-    x++;
+    oled.print("\n[+] AUTORUN (R)");
     autorun = false;
   }
 
   if (written == true && written_reported == false) {
-    if (x == OLED_LINES) cls();
-    oled.println("[!] WRITING");
-    x++;
+    oled.print("\n[!] WRITING");
     written = false;
     written_reported = true;
   }
@@ -289,9 +282,8 @@ bool msc_ready_callback(void) {
 // Clear display
 void cls(void) {
   oled.clear();
-  oled.println(VERSION);
-  oled.println("----------------");
-  x = 2;
+  oled.print(VERSION);
+  oled.print("\n----------------");
 }
 
 // HexDump
@@ -346,9 +338,7 @@ void tuh_hid_mount_cb(uint8_t dev_addr, uint8_t instance, uint8_t const* desc_re
 
   tuh_vid_pid_get(dev_addr, &vid, &pid);
 
-  if (x == OLED_LINES) cls();
-  oled.println("[++] HID Device");
-  x++;
+  oled.print("\n[!!] HID Device");
 
   SerialTinyUSB.printf("HID device address = %d, instance = %d mounted\r\n", dev_addr, instance);
   SerialTinyUSB.printf("VID = %04x, PID = %04x\r\n", vid, pid);
@@ -370,9 +360,7 @@ void tuh_hid_report_received_cb(uint8_t dev_addr, uint8_t instance, uint8_t cons
   static bool kbd_printed = false;
   static bool mouse_printed = false;
 
-  if (x == OLED_LINES) cls();
-  oled.println("[!!] HID Sending data");
-  x++;
+  oled.print("\n[!!] HID Sending data");
 
   // Read the HID protocol
   uint8_t const itf_protocol = tuh_hid_interface_protocol(dev_addr, instance);
@@ -504,9 +492,9 @@ static void process_mouse_report(hid_mouse_report_t const* report) {
   uint8_t button_changed_mask = report->buttons ^ prev_report.buttons;
   if (button_changed_mask & report->buttons) {
     SerialTinyUSB.printf("MOUSE: %c%c%c ",
-           report->buttons & MOUSE_BUTTON_LEFT ? 'L' : '-',
-           report->buttons & MOUSE_BUTTON_MIDDLE ? 'M' : '-',
-           report->buttons & MOUSE_BUTTON_RIGHT ? 'R' : '-');
+                         report->buttons & MOUSE_BUTTON_LEFT ? 'L' : '-',
+                         report->buttons & MOUSE_BUTTON_MIDDLE ? 'M' : '-',
+                         report->buttons & MOUSE_BUTTON_RIGHT ? 'R' : '-');
   }
 
   cursor_movement(report->x, report->y, report->wheel);
