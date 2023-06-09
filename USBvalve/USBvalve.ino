@@ -80,6 +80,18 @@ boolean autorun = false;
 boolean written = false;
 boolean written_reported = false;
 
+// Set USB IDs strings, you can customize may be to avoid detection?
+// Remember that you can cusotmize FAKE_DISK_BLOCK_NUM as well
+// for the same reason.
+// You can see here for inspiration: https://the-sz.com/products/usbid/
+//
+// Example:
+//             0x0951 0x16D5    VENDORID: Kingston   PRODUCTID: DataTraveler
+//
+#define USB_VENDORID "Watchdog"   // Up to 8 chars
+#define USB_PRODUCTID "USBvalve"  // Up to 16 chars
+#define USB_VERSION "1.0"         // Up to 4 chars
+
 #define BLOCK_AUTORUN 102       // Block where Autorun.inf file is saved
 #define BLOCK_README 100        // Block where README.txt file is saved
 #define MAX_DUMP_BYTES 16       // Used by the dump of the debug facility: do not increase this too much
@@ -110,7 +122,7 @@ void setup() {
 #endif
 
   // Set disk vendor id, product id and revision with string up to 8, 16, 4 characters respectively
-  usb_msc.setID("Watchdog", "USBvalve", "0.1");
+  usb_msc.setID(USB_VENDORID, USB_PRODUCTID, USB_VERSION);
 
   // Set disk size (using the "fake" size)
   usb_msc.setCapacity(FAKE_DISK_BLOCK_NUM, DISK_BLOCK_SIZE);
