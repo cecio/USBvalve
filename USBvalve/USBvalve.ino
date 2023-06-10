@@ -94,6 +94,8 @@ boolean written_reported = false;
 #define USB_PRODUCTID 0x16D5              // This override the Pi Pico default 0x000A
 #define USB_DESCRIPTOR "DataTraveler"     // This override the Pi Pico default "Pico"
 #define USB_MANUF "Kingston"              // This override the Pi Pico default "Raspberry Pi"
+#define USB_SERIAL "123456789A"           // This override the Pi Pico default. Disabled by default. \
+                                          // See "setSerialDescriptor" in setup() if needed
 #define USB_VENDORID_STR "Kingston"       // Up to 8 chars
 #define USB_PRODUCTID_STR "DataTraveler"  // Up to 16 chars
 #define USB_VERSION_STR "1.0"             // Up to 4 chars
@@ -122,6 +124,8 @@ void setup() {
   TinyUSBDevice.setID(USB_VENDORID, USB_PRODUCTID);
   TinyUSBDevice.setProductDescriptor(USB_DESCRIPTOR);
   TinyUSBDevice.setManufacturerDescriptor(USB_MANUF);
+  // This could be used to change the serial number as well
+  // TinyUSBDevice.setSerialDescriptor(USB_SERIAL);
 
   // Check consistency of RAM FS
   quark(computed_hash, msc_disk[BYTES_TO_HASH_OFFSET], BYTES_TO_HASH);
