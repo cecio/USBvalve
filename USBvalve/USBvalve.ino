@@ -84,7 +84,8 @@ boolean written_reported = false;
 //
 // Set USB IDs strings and numbers, to avoid possible detections.
 // Remember that you can cusotmize FAKE_DISK_BLOCK_NUM as well
-// for the same reason.
+// for the same reason. Also DISK_LABEL in ramdisk.h can be changed.
+//
 // You can see here for inspiration: https://the-sz.com/products/usbid/
 //
 // Example:
