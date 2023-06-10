@@ -80,17 +80,23 @@ boolean autorun = false;
 boolean written = false;
 boolean written_reported = false;
 
-// Set USB IDs strings, you can customize may be to avoid detection?
+// Anti-Detection settings.
+//
+// Set USB IDs strings and numbers, to avoid possible detections.
 // Remember that you can cusotmize FAKE_DISK_BLOCK_NUM as well
 // for the same reason.
 // You can see here for inspiration: https://the-sz.com/products/usbid/
 //
 // Example:
-//             0x0951 0x16D5    VENDORID: Kingston   PRODUCTID: DataTraveler
+//             0x0951 0x16D5    VENDORID_STR: Kingston   PRODUCTID_STR: DataTraveler
 //
-#define USB_VENDORID "Watchdog"   // Up to 8 chars
-#define USB_PRODUCTID "USBvalve"  // Up to 16 chars
-#define USB_VERSION "1.0"         // Up to 4 chars
+#define USB_VENDORID 0x0951               // This override the Pi Pico default 0x2E8A
+#define USB_PRODUCTID 0x16D5              // This override the Pi Pico default 0x000A
+#define USB_DESCRIPTOR "DataTraveler"     // This override the Pi Pico default "Pico"
+#define USB_MANUF "Kingston"              // This override the Pi Pico default "Raspberry Pi"
+#define USB_VENDORID_STR "Kingston"       // Up to 8 chars
+#define USB_PRODUCTID_STR "DataTraveler"  // Up to 16 chars
+#define USB_VERSION_STR "1.0"             // Up to 4 chars
 
 #define BLOCK_AUTORUN 102       // Block where Autorun.inf file is saved
 #define BLOCK_README 100        // Block where README.txt file is saved
@@ -112,6 +118,11 @@ u8 computed_hash[WIDTH] = { 0x00 };
 
 // Core 0 Setup: will be used for the USB mass device functions
 void setup() {
+  // Change all the USB Pico settings
+  TinyUSBDevice.setID(USB_VENDORID, USB_PRODUCTID);
+  TinyUSBDevice.setProductDescriptor(USB_DESCRIPTOR);
+  TinyUSBDevice.setManufacturerDescriptor(USB_MANUF);
+
   // Check consistency of RAM FS
   quark(computed_hash, msc_disk[BYTES_TO_HASH_OFFSET], BYTES_TO_HASH);
 
@@ -122,7 +133,7 @@ void setup() {
 #endif
 
   // Set disk vendor id, product id and revision with string up to 8, 16, 4 characters respectively
-  usb_msc.setID(USB_VENDORID, USB_PRODUCTID, USB_VERSION);
+  usb_msc.setID(USB_VENDORID_STR, USB_PRODUCTID_STR, USB_VERSION_STR);
 
   // Set disk size (using the "fake" size)
   usb_msc.setCapacity(FAKE_DISK_BLOCK_NUM, DISK_BLOCK_SIZE);
