@@ -74,7 +74,7 @@ bool activeState = false;
 //
 // USBvalve globals
 //
-#define VERSION "USBvalve - 0.9.1"
+#define VERSION "USBvalve - 0.10.0"
 boolean readme = false;
 boolean autorun = false;
 boolean written = false;
@@ -312,7 +312,7 @@ bool msc_ready_callback(void) {
 void cls(void) {
   oled.clear();
   oled.print(VERSION);
-  oled.print("\n----------------");
+  oled.print("\n-----------------");
 }
 
 // HexDump
