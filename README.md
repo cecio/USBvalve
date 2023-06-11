@@ -127,6 +127,36 @@ To flash the firmware, follow these steps:
 
 It's done!
 
+### Anti-Detection
+
+I don't know if it will ever be the case, but you may want to customize the firmware in order to avoid detection done by *USBvalve-aware* malware :-)
+
+I grouped most of the variables you may want to modify in this section
+
+```C
+// Anti-Detection settings.
+//
+// Set USB IDs strings and numbers, to avoid possible detections.
+// Remember that you can cusotmize FAKE_DISK_BLOCK_NUM as well
+// for the same reason. Also DISK_LABEL in ramdisk.h can be changed.
+//
+// You can see here for inspiration: https://the-sz.com/products/usbid/
+//
+// Example:
+//             0x0951 0x16D5    VENDORID_STR: Kingston   PRODUCTID_STR: DataTraveler
+//
+#define USB_VENDORID 0x0951               // This override the Pi Pico default 0x2E8A
+#define USB_PRODUCTID 0x16D5              // This override the Pi Pico default 0x000A
+#define USB_DESCRIPTOR "DataTraveler"     // This override the Pi Pico default "Pico"
+#define USB_MANUF "Kingston"              // This override the Pi Pico default "Raspberry Pi"
+#define USB_SERIAL "123456789A"           // This override the Pi Pico default. Disabled by default. \
+                                          // See "setSerialDescriptor" in setup() if needed
+#define USB_VENDORID_STR "Kingston"       // Up to 8 chars
+#define USB_PRODUCTID_STR "DataTraveler"  // Up to 16 chars
+#define USB_VERSION_STR "1.0"             // Up to 4 chars
+```
+
+
 ### Building your firmware
 
 Obviously you can also build your own firmware. To build the *standard* one I used:
