@@ -155,8 +155,6 @@ void setup() {
   usb_msc.setReadyCallback(msc_ready_callback);
 #endif
 
-  usb_msc.begin();
-
   // Screen Init
   Wire.begin();
   Wire.setClock(400000L);
@@ -187,6 +185,8 @@ void setup() {
       delay(1000);  // Loop forever
     }
   }
+
+  usb_msc.begin();
 }
 
 // Core 1 Setup: will be used for the USB host functions for BADUSB detector
