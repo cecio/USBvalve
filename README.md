@@ -171,7 +171,7 @@ If you want to re-create a new fake filesystem, you may want to have a look to t
 
 #### Dockerfile
 
-If you want to build your own firmware, after you customized it, I provide a `Dockerfile` which builds a complete **Arduino** environment and compile the firmware, just do this in main `USBvalve` folder:
+If you want to build your own firmware, after you customized it, I provide a `Dockerfile` which builds a complete **Arduino** environment and compile the firmware. Enter the following commands in the main `USBvalve` folder:
 
 ```
 docker build -t usbvalve/arduino-cli .
