@@ -164,9 +164,22 @@ Obviously you can also build your own firmware. To build the *standard* one I us
 - Arduino IDE 2.1.0
 - ~~as board I used `Raspberry Pi Pico - Arduino MBED OS RP2040` version `4.0.2`~~
 - ~~`Adafruit TinyUSB Library` version `1.14.4`. Newer versions are not working because the RPI SDK of the board is stick to an older version.  May be migrate the entire project directly on Raspberry Pi Pico SDK is the solution here.~~
-- `Adafruit TinyUSB Library` version `2.2.1` and Board `Raspberry Pi RP2040 (2.7.0)` setting clock at 240MHz (overclock)
+- `Adafruit TinyUSB Library` version `2.2.1` and Board `Raspberry Pi RP2040 (3.3.0)` setting clock at 240MHz (overclock)
 - `ssd1306` OLED library version `1.8.3`
 
 If you want to re-create a new fake filesystem, you may want to have a look to the `utils` folder, where I placed some utilities to build a new one.
 
-**NOTE**: if you have ideas or improvements in your mind, I encourage you to open an issue so that we can improve the project together! Thanks!
+#### Dockerfile
+
+If you want to build your own firmware, after you customized it, I provide a `Dockerfile` which builds a complete Arduino environment and compile the firmware, just do this in main `USBvalve` folder:
+
+```
+docker build -t usbvalve/arduino-cli .
+docker run --rm --name usbvalve -v $PWD:/mnt usbvalve/arduino-cli /mnt/USBvalve 
+```
+
+The firmware will be placed with extension `uf2` in folder `USBvalve_out`.
+
+### Contribute
+
+If you have ideas or improvements in your mind, I encourage you to open an issue so that we can improve the project together! Thanks!
