@@ -131,7 +131,7 @@ It's done!
 
 I don't know if it will ever be the case, but you may want to customize the firmware in order to avoid detection done by *USBvalve-aware* malware :-)
 
-I grouped most of the variables you may want to modify in this section
+I grouped most of the variables you may want to modify in this section ([see Dockerfile below for rebuilding](####Dockerfile))
 
 ```C
 // Anti-Detection settings.
@@ -171,7 +171,7 @@ If you want to re-create a new fake filesystem, you may want to have a look to t
 
 #### Dockerfile
 
-If you want to build your own firmware, after you customized it, I provide a `Dockerfile` which builds a complete Arduino environment and compile the firmware, just do this in main `USBvalve` folder:
+If you want to build your own firmware, after you customized it, I provide a `Dockerfile` which builds a complete **Arduino** environment and compile the firmware, just do this in main `USBvalve` folder:
 
 ```
 docker build -t usbvalve/arduino-cli .
