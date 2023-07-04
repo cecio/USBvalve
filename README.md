@@ -131,7 +131,7 @@ It's done!
 
 I don't know if it will ever be the case, but you may want to customize the firmware in order to avoid detection done by *USBvalve-aware* malware :-)
 
-I grouped most of the variables you may want to modify in this section ([see Dockerfile below for rebuilding](####Dockerfile))
+I grouped most of the variables you may want to modify in this section ([see Dockerfile below for rebuilding](https://github.com/cecio/USBvalve#dockerfile))
 
 ```C
 // Anti-Detection settings.
