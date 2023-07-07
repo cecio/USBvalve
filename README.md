@@ -1,6 +1,6 @@
 <h1><img width="200" alt="logo, landscape, dark text, transparent background" src="https://github.com/cecio/USBvalve/blob/main/pictures/USBvalve_logo_scaled.png"></a></h1>
 
-*Expose USB activity on the fly*
+### *Expose USB activity on the fly*
 
 <img src="https://github.com/cecio/USBvalve/blob/main/pictures/versions.png" alt="The two models" width="30%" height="30%" />
 
