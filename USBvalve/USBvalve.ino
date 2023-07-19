@@ -42,7 +42,7 @@ Adafruit_USBH_Host USBHost;
 // Define vars for OLED screen
 #define I2C_ADDRESS 0x3C  // 0X3C+SA0 - 0x3C or 0x3D
 #define RST_PIN -1        // Define proper RST_PIN if required.
-#define OLED_HEIGHT 32    // 64 or 32 depending on the OLED
+#define OLED_HEIGHT 64    // 64 or 32 depending on the OLED
 #define OLED_LINES (OLED_HEIGHT / 8)
 SSD1306AsciiWire oled;
 
@@ -74,11 +74,13 @@ bool activeState = false;
 //
 // USBvalve globals
 //
-#define VERSION "USBvalve - 0.11.0"
+#define VERSION "USBvalve - 0.12.0"
 boolean readme = false;
 boolean autorun = false;
 boolean written = false;
 boolean written_reported = false;
+boolean hid_sent = false;
+boolean hid_reported = false;
 
 // Anti-Detection settings.
 //
@@ -221,6 +223,17 @@ void loop() {
     written = false;
     written_reported = true;
   }
+
+  if (hid_sent == true && hid_reported == false) {
+    oled.print("\n[!!] HID Sending data");
+    hid_sent = false;
+    hid_reported = true;
+  }
+
+  if (BOOTSEL) {
+    oled.print("\n[+] RESETTING");
+    swreset();
+  }
 }
 
 // Main Core1 loop: managing USB Host
@@ -351,6 +364,13 @@ void hexDump(unsigned char* data, size_t size) {
   SerialTinyUSB.println();
 }
 
+// Reset the Pico
+void swreset()
+{
+    watchdog_enable(1500, 1);
+    while(1);
+}
+
 //
 // BADUSB detector section
 //
@@ -381,6 +401,10 @@ void tuh_hid_mount_cb(uint8_t dev_addr, uint8_t instance, uint8_t const* desc_re
 // Invoked when device with hid interface is un-mounted
 void tuh_hid_umount_cb(uint8_t dev_addr, uint8_t instance) {
   SerialTinyUSB.printf("HID device address = %d, instance = %d unmounted\r\n", dev_addr, instance);
+
+  // Reset HID sent flag
+  hid_sent = false;
+  hid_reported = false;
 }
 
 // Invoked when received report from device
@@ -389,8 +413,9 @@ void tuh_hid_report_received_cb(uint8_t dev_addr, uint8_t instance, uint8_t cons
   static bool kbd_printed = false;
   static bool mouse_printed = false;
 
-  oled.print("\n[!!] HID Sending data");
-
+  // Used in main loop to write output to OLED
+  hid_sent = true;
+  
   // Read the HID protocol
   uint8_t const itf_protocol = tuh_hid_interface_protocol(dev_addr, instance);
 
