@@ -74,7 +74,7 @@ bool activeState = false;
 //
 // USBvalve globals
 //
-#define VERSION "USBvalve - 0.12.1"
+#define VERSION "USBvalve - 0.12.2"
 boolean readme = false;
 boolean autorun = false;
 boolean written = false;
