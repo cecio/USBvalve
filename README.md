@@ -165,7 +165,7 @@ Obviously you can also build your own firmware. To build the *standard* one I us
 - Arduino IDE 2.1.1
 - ~~as board I used `Raspberry Pi Pico - Arduino MBED OS RP2040` version `4.0.2`~~
 - ~~`Adafruit TinyUSB Library` version `1.14.4`. Newer versions are not working because the RPI SDK of the board is stick to an older version.  May be migrate the entire project directly on Raspberry Pi Pico SDK is the solution here.~~
-- `Adafruit TinyUSB Library` version `2.2.2` and Board `Raspberry Pi RP2040 (3.3.1)` setting clock at 240MHz (overclock)
+- `Adafruit TinyUSB Library` version `2.2.2` and Board `Raspberry Pi RP2040 (3.3.2)` setting clock at 240MHz (overclock)
 - `ssd1306` OLED library version `1.8.3`
 
 If you want to re-create a new fake filesystem, you may want to have a look to the `utils` folder, where I placed some utilities to build a new one.
