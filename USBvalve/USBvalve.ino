@@ -19,6 +19,8 @@
 #include <pio_usb.h>
 #include "Adafruit_TinyUSB.h"
 #include "SSD1306AsciiWire.h"
+#include <XxHash_arduino.h>
+#include <pico/stdlib.h> 
 
 //
 // BADUSB detector section
@@ -42,7 +44,7 @@ Adafruit_USBH_Host USBHost;
 // Define vars for OLED screen
 #define I2C_ADDRESS 0x3C  // 0X3C+SA0 - 0x3C or 0x3D
 #define RST_PIN -1        // Define proper RST_PIN if required.
-#define OLED_HEIGHT 64    // 64 or 32 depending on the OLED
+#define OLED_HEIGHT 32    // 64 or 32 depending on the OLED
 #define OLED_LINES (OLED_HEIGHT / 8)
 SSD1306AsciiWire oled;
 
@@ -52,7 +54,6 @@ SSD1306AsciiWire oled;
 #define FAKE_DISK_BLOCK_NUM 0x800
 #define DISK_BLOCK_SIZE 0x200
 #include "ramdisk.h"
-#include "quark.h"
 
 Adafruit_USBD_MSC usb_msc;
 
@@ -74,7 +75,7 @@ bool activeState = false;
 //
 // USBvalve globals
 //
-#define VERSION "USBvalve - 0.12.3"
+#define VERSION "USBvalve - 0.13.0"
 boolean readme = false;
 boolean autorun = false;
 boolean written = false;
@@ -110,16 +111,7 @@ boolean hid_reported = false;
 #define BYTES_TO_HASH_OFFSET 7  // Starting sector to check for consistency (FAT_DIRECTORY is 7)
 
 // Burned hash to check consistency
-u8 valid_hash[WIDTH] = {
-  0x60, 0xFB, 0x68, 0xB5, 0xB9, 0xE6, 0xF4, 0xB7,
-  0x5F, 0xAD, 0x3C, 0x0D, 0xD3, 0x85, 0x01, 0x74,
-  0xED, 0x70, 0x55, 0x55, 0xE8, 0x1D, 0xE4, 0xBB,
-  0x4F, 0xC7, 0x2C, 0xA6, 0x7C, 0xC7, 0x79, 0x79,
-  0xEF, 0x21, 0x81, 0xB0, 0xEB, 0xD1, 0xF1, 0x71,
-  0x72, 0x37, 0x13, 0x0C, 0x28, 0x39, 0xC0, 0xB0
-};
-
-u8 computed_hash[WIDTH] = { 0x00 };
+uint valid_hash = 2362816530;
 
 // Core 0 Setup: will be used for the USB mass device functions
 void setup() {
@@ -129,10 +121,6 @@ void setup() {
   TinyUSBDevice.setManufacturerDescriptor(USB_MANUF);
   // This could be used to change the serial number as well
   // TinyUSBDevice.setSerialDescriptor(USB_SERIAL);
-
-  // Check consistency of RAM FS
-  // Add 11 bytes to skip the DISK_LABEL from the hashing
-  quark(computed_hash, msc_disk[BYTES_TO_HASH_OFFSET] + 11, BYTES_TO_HASH);
 
 #if defined(ARDUINO_ARCH_MBED) && defined(ARDUINO_ARCH_RP2040)
   // Manual begin() is required on core without built-in support for TinyUSB such as
@@ -178,7 +166,11 @@ void setup() {
   oled.setScrollMode(SCROLL_MODE_AUTO);
   cls();  // Clear display
 
-  if (memcmp(computed_hash, valid_hash, WIDTH) == 0) {
+  // Check consistency of RAM FS
+  // Add 11 bytes to skip the DISK_LABEL from the hashing
+  uint computed_hash;
+  computed_hash = XXH32(msc_disk[BYTES_TO_HASH_OFFSET] + 11, BYTES_TO_HASH, 0);
+  if (computed_hash == valid_hash) {
     oled.print("\n[+] Selftest: OK");
   } else {
     oled.print("\n[!] Selftest: KO");
@@ -193,7 +185,8 @@ void setup() {
 
 // Core 1 Setup: will be used for the USB host functions for BADUSB detector
 void setup1() {
-  //while ( !Serial ) delay(10);   // wait for native usb
+  // Set a custom clock (multiple of 12Mhz) to achieve maximum compatibility
+  set_sys_clock_khz(144000, true);
 
   pio_usb_configuration_t pio_cfg = PIO_USB_DEFAULT_CONFIG;
   pio_cfg.pin_dp = HOST_PIN_DP;

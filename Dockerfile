@@ -27,12 +27,13 @@ RUN cd /app \
     && arduino-cli lib install "Adafruit TinyUSB Library" \
     && arduino-cli lib install "ssd1306" \
     && arduino-cli lib install "Pico PIO USB" \
+    && arduino-cli lib install "XxHash_arduino" \
     && arduino-cli lib install "SSD1306Ascii"
 
 # Compilation setup
 RUN echo  "#!/bin/bash" > /app/entrypoint.sh \
     && echo  "export PATH=\$PATH:/app/arduino-cli/bin" >> /app/entrypoint.sh \
-    && echo  "arduino-cli compile --fqbn rp2040:rp2040:rpipico --board-options \"usbstack=tinyusb\" --board-options \"freq=240\" --output-dir \"/mnt/USBvalve_out\" \"\$1\"" >> /app/entrypoint.sh \
+    && echo  "arduino-cli compile --fqbn rp2040:rp2040:rpipico --board-options \"usbstack=tinyusb\" --board-options \"freq=120\" --output-dir \"/mnt/USBvalve_out\" \"\$1\"" >> /app/entrypoint.sh \
     && chmod +x /app/entrypoint.sh
 
 ENTRYPOINT ["/app/entrypoint.sh"]
