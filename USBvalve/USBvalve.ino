@@ -20,7 +20,7 @@
 #include "Adafruit_TinyUSB.h"
 #include "SSD1306AsciiWire.h"
 #include <XxHash_arduino.h>
-#include <pico/stdlib.h> 
+#include <pico/stdlib.h>
 
 //
 // BADUSB detector section
@@ -75,11 +75,13 @@ bool activeState = false;
 //
 // USBvalve globals
 //
-#define VERSION "USBvalve - 0.13.1"
+#define VERSION "USBvalve - 0.14.0"
 boolean readme = false;
 boolean autorun = false;
 boolean written = false;
+boolean deleted = false;
 boolean written_reported = false;
+boolean deleted_reported = false;
 boolean hid_sent = false;
 boolean hid_reported = false;
 
@@ -211,6 +213,12 @@ void loop() {
     autorun = false;
   }
 
+  if (deleted == true && deleted_reported == false) {
+    oled.print("\n[!] DELETING");
+    deleted = false;
+    deleted_reported = true;
+  }
+
   if (written == true && written_reported == false) {
     oled.print("\n[!] WRITING");
     written = false;
@@ -275,14 +283,25 @@ int32_t msc_read_callback(uint32_t lba, void* buffer, uint32_t bufsize) {
 // This happens only for the "real" size of disk
 int32_t msc_write_callback(uint32_t lba, uint8_t* buffer, uint32_t bufsize) {
 
+  // Check for file deletion at Block 7
+  // The first char of filename is replaced with 0xE5, we are going
+  // to check for it
+  if (lba == 7) {
+    if (buffer[32] == 0xE5 || buffer[64] == 0xE5 || buffer[160] == 0xE5) {
+      deleted = true;
+    }
+  }
+
   // This check for writing of space. The LBA > 10 is set to avoid some
   // false positives, in particular on Windows Systems
   if (lba > 10) {
     written = true;
   }
+
   // We are declaring a bigger size than what is actually allocated, so
   // this is protecting our memory integrity
   if (lba < DISK_BLOCK_NUM - 1) {
+    // Writing buffer to "disk"
     uint8_t* addr = msc_disk[lba];
     memcpy(addr, buffer, bufsize);
   }
@@ -358,10 +377,10 @@ void hexDump(unsigned char* data, size_t size) {
 }
 
 // Reset the Pico
-void swreset()
-{
-    watchdog_enable(1500, 1);
-    while(1);
+void swreset() {
+  watchdog_enable(1500, 1);
+  while (1)
+    ;
 }
 
 //
@@ -408,7 +427,7 @@ void tuh_hid_report_received_cb(uint8_t dev_addr, uint8_t instance, uint8_t cons
 
   // Used in main loop to write output to OLED
   hid_sent = true;
-  
+
   // Read the HID protocol
   uint8_t const itf_protocol = tuh_hid_interface_protocol(dev_addr, instance);
 

@@ -37,6 +37,8 @@
 //    README.TXT
 //    System Volume Information
 //
+// Files information are saved at Block 7
+//
 
 // Keep 11 chars
 #define DISK_LABEL 'M', 'y', 'D', 'r', 'i', 'v', 'e', ' ', ' ', ' ', ' '
