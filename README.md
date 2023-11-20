@@ -1,4 +1,4 @@
-<h1><img width="200" alt="logo, landscape, dark text, transparent background" src="https://github.com/cecio/USBvalve/blob/main/pictures/USBvalve_logo_scaled.png"></a></h1>
+<h1><img width="300" alt="logo, landscape, dark text, transparent background" src="https://github.com/cecio/USBvalve/blob/main/pictures/USBvalve_logo_scaled.png"></a></h1>
 
 ### *Expose USB activity on the fly*
 
@@ -43,7 +43,7 @@ If you prefer videos, you can also have a look to my [Insomni'hack Presentation]
 
 `pictures`: images and resources used in this doc
 
-`STL`: STL files for enclosure. In `1.1` and `1.2' folers there are full enclosures (thanks to [WhistleMaster](https://github.com/WhistleMaster). If you want something lighter to protect the LCD you can go with `USBvalve_sliding_cover.stl`.
+`STL`: STL files for enclosure. In `1.1` and `1.2` folers there are full enclosures (thanks to [WhistleMaster](https://github.com/WhistleMaster). If you want something lighter to protect the LCD you can go with `USBvalve_sliding_cover.stl`.
 
 ## Build USBvalve
 
