@@ -44,7 +44,7 @@ Adafruit_USBH_Host USBHost;
 // Define vars for OLED screen
 #define I2C_ADDRESS 0x3C  // 0X3C+SA0 - 0x3C or 0x3D
 #define RST_PIN -1        // Define proper RST_PIN if required.
-#define OLED_HEIGHT 32    // 64 or 32 depending on the OLED
+#define OLED_HEIGHT 64    // 64 or 32 depending on the OLED
 #define OLED_LINES (OLED_HEIGHT / 8)
 SSD1306AsciiWire oled;
 
@@ -75,7 +75,7 @@ bool activeState = false;
 //
 // USBvalve globals
 //
-#define VERSION "USBvalve - 0.14.1"
+#define VERSION "USBvalve - 0.14.2"
 boolean readme = false;
 boolean autorun = false;
 boolean written = false;
