@@ -1,9 +1,12 @@
-/*
+/*********************************************************************
+
   USBvalve
   
   written by Cesare Pizzi
-  This project extensively reuse code done by Adafruit and TinyUSB. Please support them!
-*/
+  This project extensively reuse code done by Adafruit and TinyUSB. 
+  Please support them!
+
+*********************************************************************/
 
 /*********************************************************************
   Adafruit invests time and resources providing this open source code,
@@ -16,11 +19,25 @@
   any redistribution
 *********************************************************************/
 
+// Uncomment the following to compile for the RP2040 based TFT round display
+// https://www.raspberrypi.com/news/how-to-build-your-own-raspberry-pi-watch/
+//#define PIWATCH
+
 #include <pio_usb.h>
 #include "Adafruit_TinyUSB.h"
-#include "SSD1306AsciiWire.h"
 #include <XxHash_arduino.h>
 #include <pico/stdlib.h>
+
+#if defined(PIWATCH)
+
+#include <Arduino_GFX_Library.h>
+#include "background.h"
+
+#else
+
+#include "SSD1306AsciiWire.h"
+
+#endif
 
 //
 // BADUSB detector section
@@ -42,11 +59,31 @@ Adafruit_USBH_Host USBHost;
 // END of BADUSB detector section
 
 // Define vars for OLED screen
+#if defined(PIWATCH)
+
+#define GFX_DC    8
+#define GFX_CS    9
+#define GFX_MOSI 11
+#define GFX_CLK  10
+#define GFX_RST  12
+#define GFX_MISO 12
+#define GFX_BL   25     // Backlight
+
+Arduino_DataBus *bus = new Arduino_RPiPicoSPI(GFX_DC, GFX_CS, GFX_CLK, GFX_MOSI, GFX_MISO, spi1 /* spi */);
+Arduino_GFX *gfx = new Arduino_GC9A01(bus, GFX_RST, 1 /* rotation */, true /* IPS */);
+
+int32_t w, h, n, n1, cx, cy, cx1, cy1, cn, cn1;
+uint8_t tsa, tsb, tsc, ds;
+
+#else
+
 #define I2C_ADDRESS 0x3C  // 0X3C+SA0 - 0x3C or 0x3D
 #define RST_PIN -1        // Define proper RST_PIN if required.
-#define OLED_HEIGHT 64    // 64 or 32 depending on the OLED
+#define OLED_HEIGHT 32    // 64 or 32 depending on the OLED
 #define OLED_LINES (OLED_HEIGHT / 8)
-SSD1306AsciiWire oled;
+SSD1306AsciiWire display;
+
+#endif
 
 // Define the dimension of RAM DISK. We have a "real" one (for which
 // a real array is created) and a "fake" one, presented to the OS
@@ -75,7 +112,7 @@ bool activeState = false;
 //
 // USBvalve globals
 //
-#define VERSION "USBvalve - 0.14.4"
+#define VERSION "USBvalve - 0.15.0"
 boolean readme = false;
 boolean autorun = false;
 boolean written = false;
@@ -85,6 +122,7 @@ boolean deleted_reported = false;
 boolean hid_sent = false;
 boolean hid_reported = false;
 
+//
 // Anti-Detection settings.
 //
 // Set USB IDs strings and numbers, to avoid possible detections.
@@ -147,42 +185,64 @@ void setup() {
   usb_msc.setReadyCallback(msc_ready_callback);
 #endif
 
+  // Check consistency of RAM FS
+  // Add 11 bytes to skip the DISK_LABEL from the hashing
+  // The startup of the USB has been moved before init of the 
+  // screen because sometimes it insert some delay preventing
+  // proper initialization of the mass device
+  uint computed_hash;
+  computed_hash = XXH32(msc_disk[BYTES_TO_HASH_OFFSET] + 11, BYTES_TO_HASH, 0);
+  if (computed_hash == valid_hash) {
+      usb_msc.begin();
+  }
+
   // Screen Init
+#if defined(PIWATCH)
+  gfx->begin();
+  pinMode(GFX_BL, OUTPUT);
+  digitalWrite(GFX_BL, HIGH);         // Backlight on
+  gfx->fillScreen(BLACK);             // Clear screen
+  gfx->draw16bitRGBBitmap(10,0,background,210,210);    // Draw background
+  delay(2000);
+#else
   Wire.begin();
   Wire.setClock(400000L);
 #if OLED_HEIGHT == 64
 #if RST_PIN >= 0
-  oled.begin(&Adafruit128x64, I2C_ADDRESS, RST_PIN);
+  display.begin(&Adafruit128x64, I2C_ADDRESS, RST_PIN);
 #else
-  oled.begin(&Adafruit128x64, I2C_ADDRESS);
+  display.begin(&Adafruit128x64, I2C_ADDRESS);
 #endif
 #else
 #if RST_PIN >= 0
-  oled.begin(&Adafruit128x32, I2C_ADDRESS, RST_PIN);
+  display.begin(&Adafruit128x32, I2C_ADDRESS, RST_PIN);
 #else
-  oled.begin(&Adafruit128x32, I2C_ADDRESS);
+  display.begin(&Adafruit128x32, I2C_ADDRESS);
+#endif
 #endif
 #endif
 
-  oled.setFont(Adafruit5x7);
-  oled.setScrollMode(SCROLL_MODE_AUTO);
+#if defined(PIWATCH)
+  // gfx->setTextSize(tsb);
+  gfx->setTextSize(1);
+  gfx->setTextColor(MAGENTA);
+#else
+  display.setFont(Adafruit5x7);
+  display.setScrollMode(SCROLL_MODE_AUTO);
+#endif
+
   cls();  // Clear display
 
-  // Check consistency of RAM FS
-  // Add 11 bytes to skip the DISK_LABEL from the hashing
-  uint computed_hash;
-  computed_hash = XXH32(msc_disk[BYTES_TO_HASH_OFFSET] + 11, BYTES_TO_HASH, 0);
+  // Now outputs the result of the check
   if (computed_hash == valid_hash) {
-    oled.print("\n[+] Selftest: OK");
+    printout("\n[+] Selftest: OK");
   } else {
-    oled.print("\n[!] Selftest: KO");
-    oled.print("\n[!] Stopping...");
+    printout("\n[!] Selftest: KO");
+    printout("\n[!] Stopping...");
     while (1) {
       delay(1000);  // Loop forever
     }
   }
-
-  usb_msc.begin();
 }
 
 // Core 1 Setup: will be used for the USB host functions for BADUSB detector
@@ -204,35 +264,35 @@ void setup1() {
 void loop() {
 
   if (readme == true) {
-    oled.print("\n[!] README (R)");
+    printout("\n[!] README (R)");
     readme = false;
   }
 
   if (autorun == true) {
-    oled.print("\n[+] AUTORUN (R)");
+    printout("\n[+] AUTORUN (R)");
     autorun = false;
   }
 
   if (deleted == true && deleted_reported == false) {
-    oled.print("\n[!] DELETING");
+    printout("\n[!] DELETING");
     deleted = false;
     deleted_reported = true;
   }
 
   if (written == true && written_reported == false) {
-    oled.print("\n[!] WRITING");
+    printout("\n[!] WRITING");
     written = false;
     written_reported = true;
   }
 
   if (hid_sent == true && hid_reported == false) {
-    oled.print("\n[!!] HID Sending data");
+    printout("\n[!!] HID Sending data");
     hid_sent = false;
     hid_reported = true;
   }
 
   if (BOOTSEL) {
-    oled.print("\n[+] RESETTING");
+    printout("\n[+] RESETTING");
     swreset();
   }
 }
@@ -333,12 +393,50 @@ bool msc_ready_callback(void) {
 }
 #endif
 
+#if defined(PIWATCH)
+void printout(const char *str)
+{
+  int y;
+
+  y = gfx->getCursorY();
+  // Check if we reached the end of the printable area
+  if (y > 120) {
+    cls();
+    y = gfx->getCursorY();
+  }
+  gfx->setCursor(70, y+10);
+
+  // Skip the newline at the beginning if used
+  if (str[0] == '\n') {
+    gfx->print(str+1);
+  } else {
+    gfx->print(str);
+  }
+}
+#else
+void printout(const char *str)
+{
+  display.print(str);  
+}
+#endif
+
+#if defined(PIWATCH)
 // Clear display
 void cls(void) {
-  oled.clear();
-  oled.print(VERSION);
-  oled.print("\n-----------------");
+  gfx->fillRoundRect(60, 70, 140, 75, 10, gfx->color565(0, 0, 0));
+  gfx->setCursor(70, 80);
+  gfx->print(VERSION);
+  gfx->setCursor(70, 90);
+  gfx->print("-----------------");
 }
+#else
+// Clear display
+void cls(void) {
+  display.clear();
+  printout(VERSION);
+  printout("\n-----------------");
+}
+#endif
 
 // HexDump
 void hexDump(unsigned char* data, size_t size) {
@@ -399,7 +497,7 @@ void tuh_hid_mount_cb(uint8_t dev_addr, uint8_t instance, uint8_t const* desc_re
 
   tuh_vid_pid_get(dev_addr, &vid, &pid);
 
-  oled.print("\n[!!] HID Device");
+  printout("\n[!!] HID Device");
 
   SerialTinyUSB.printf("HID device address = %d, instance = %d mounted\r\n", dev_addr, instance);
   SerialTinyUSB.printf("VID = %04x, PID = %04x\r\n", vid, pid);
