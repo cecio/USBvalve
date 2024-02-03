@@ -184,8 +184,8 @@ void setup() {
 
   // Check consistency of RAM FS
   // Add 11 bytes to skip the DISK_LABEL from the hashing
-  // The startup of the USB has been moved before init of the 
-  // screen because sometimes it insert some delay preventing
+  // The startup of the USB has been moved before initialization of the 
+  // screen because sometimes it inserts some delay preventing
   // proper initialization of the mass device
   uint computed_hash;
   computed_hash = XXH32(msc_disk[BYTES_TO_HASH_OFFSET] + 11, BYTES_TO_HASH, 0);
