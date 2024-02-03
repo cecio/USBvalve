@@ -72,9 +72,6 @@ Adafruit_USBH_Host USBHost;
 Arduino_DataBus *bus = new Arduino_RPiPicoSPI(GFX_DC, GFX_CS, GFX_CLK, GFX_MOSI, GFX_MISO, spi1 /* spi */);
 Arduino_GFX *gfx = new Arduino_GC9A01(bus, GFX_RST, 1 /* rotation */, true /* IPS */);
 
-int32_t w, h, n, n1, cx, cy, cx1, cy1, cn, cn1;
-uint8_t tsa, tsb, tsc, ds;
-
 #else
 
 #define I2C_ADDRESS 0x3C  // 0X3C+SA0 - 0x3C or 0x3D
