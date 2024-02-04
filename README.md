@@ -32,6 +32,11 @@ This is an example of the *BADUSB* debugger available on serial port:
 
 If you prefer videos, you can also have a look to my [Insomni'hack Presentation](https://www.youtube.com/watch?v=jy1filtQY4w)
 
+## USBvalve Watch
+
+Starting from version `0.15.0` a new *Pi Pico Watch* version is supported. To compile the new version you have to uncomment the `#define PIWATCH` line at the beginning of the code. The hardware is a RP2040-based 1.28-inch TFT display and watch board. You can find some more info [here](https://www.raspberrypi.com/news/how-to-build-your-own-raspberry-pi-watch/).
+This is also fully compatible with the [Waveshare RP2040-LCD-1.28](https://www.waveshare.com/wiki/RP2040-LCD-1.28).
+
 ## Repository Structure
 
 `docs`: documentation about the project, with a presentation where you can have a look to all the features
