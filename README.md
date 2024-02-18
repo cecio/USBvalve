@@ -34,7 +34,7 @@ If you prefer videos, you can also have a look to my [Insomni'hack Presentation]
 
 ## USBvalve Watch
 
-Starting from version `0.15.0` a new *Pi Pico Watch* version is supported. To compile the new version you have to uncomment the `#define PIWATCH` line at the beginning of the code or use the pre-compiled firmware provided. The hardware is a RP2040-based 1.28-inch TFT display and watch board. You can find some more info [here](https://www.raspberrypi.com/news/how-to-build-your-own-raspberry-pi-watch/).
+Starting from version `0.15.0` a new *Pi Pico Watch* version is supported. To compile the new version you have to uncomment the `#define PIWATCH` line at the beginning of the code. The hardware is a RP2040-based 1.28-inch TFT display and watch board. You can find some more info [here](https://www.raspberrypi.com/news/how-to-build-your-own-raspberry-pi-watch/).
 This is also fully compatible with the [Waveshare RP2040-LCD-1.28](https://www.waveshare.com/wiki/RP2040-LCD-1.28).
 
 ## Repository Structure
@@ -170,8 +170,8 @@ I grouped most of the variables you may want to modify in this section ([see Doc
 
 Obviously you can also build your own firmware. To build the *standard* one I used:
 
-- Arduino IDE `2.2.1`
-- `Adafruit TinyUSB Library` version `2.4.1`, `Pico-PIO-USB` version `0.5.2`, Board `Raspberry Pi RP2040 (3.6.3)` setting Tools=>CPU Speed at `120MHz` and Tools=>USB Stack to `Adafruit TinyUSB`
+- Arduino IDE `2.3.1`
+- `Adafruit TinyUSB Library` version `3.0.0`, `Pico-PIO-USB` version `0.5.2`, Board `Raspberry Pi RP2040 (3.7.2)` setting Tools=>CPU Speed at `120MHz` and Tools=>USB Stack to `Adafruit TinyUSB`
 - `ssd1306` OLED library version `1.8.3`
 
 If you want to re-create a new fake filesystem, you may want to have a look to the `utils` folder, where I placed some utilities to build a new one.
