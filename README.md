@@ -190,3 +190,7 @@ The firmware will be placed with extension `uf2` in folder `USBvalve_out`.
 ### Contribute
 
 If you have ideas or improvements in your mind, I encourage you to open an issue so that we can improve the project together! Thanks!
+
+### Support
+
+If you have question or need support you can open an `Issue` here or reach me out on Twitter/X [@red5heep](https://twitter.com/red5heep)
