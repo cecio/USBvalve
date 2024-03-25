@@ -5,6 +5,7 @@
 <p float="left">
 <img src="https://github.com/cecio/USBvalve/blob/main/pictures/versions.png" alt="The two models" width="30%" height="30%" />
 <img src="https://github.com/cecio/USBvalve/blob/main/pictures/USBvalve_PIWATCH.png" alt="The Watch" width="26%" height="26%" />
+<img src="https://github.com/cecio/USBvalve/blob/main/pictures/version1_2.png" alt="1.2" width="26%" height="26%" />
 </p>
 
 I'm sure that, like me, you were asked to put your USB drive in an *unknown* device...and then the doubt: 
