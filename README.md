@@ -170,8 +170,8 @@ I grouped most of the variables you may want to modify in this section ([see Doc
 
 Obviously you can also build your own firmware. To build the *standard* one I used:
 
-- Arduino IDE `2.3.1`
-- `Adafruit TinyUSB Library` version `3.0.0`, `Pico-PIO-USB` version `0.5.2`, Board `Raspberry Pi RP2040 (3.7.2)` setting Tools=>CPU Speed at `120MHz` and Tools=>USB Stack to `Adafruit TinyUSB`
+- Arduino IDE `2.3.2`
+- `Adafruit TinyUSB Library` version `3.1.1`, `Pico-PIO-USB` version `0.5.2`, Board `Raspberry Pi RP2040 (3.7.2)` setting Tools=>CPU Speed at `120MHz` and Tools=>USB Stack to `Adafruit TinyUSB`
 - `ssd1306` OLED library version `1.8.3`
 
 If you want to re-create a new fake filesystem, you may want to have a look to the `utils` folder, where I placed some utilities to build a new one.

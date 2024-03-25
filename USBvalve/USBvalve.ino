@@ -109,7 +109,7 @@ bool activeState = false;
 //
 // USBvalve globals
 //
-#define VERSION "USBvalve - 0.15.1"
+#define VERSION "USBvalve - 0.16.0"
 boolean readme = false;
 boolean autorun = false;
 boolean written = false;
@@ -244,7 +244,7 @@ void setup() {
 
 // Core 1 Setup: will be used for the USB host functions for BADUSB detector
 void setup1() {
-  // Set a custom clock (multiple of 12Mhz) to achieve maximum compatibility
+  // Set a custom clock (multiple of 12Mhz) to achieve maximum compatibility for HID
   set_sys_clock_khz(144000, true);
 
   pio_usb_configuration_t pio_cfg = PIO_USB_DEFAULT_CONFIG;
@@ -666,3 +666,31 @@ void cursor_movement(int8_t x, int8_t y, int8_t wheel) {
 }
 
 // END of BADUSB detector section
+
+//
+// OTHER Host devices detection section
+//
+
+// Invoked when a device with MassStorage interface is mounted
+void tuh_msc_mount_cb(uint8_t dev_addr) {
+  printout("\n[++] Mass Device");
+  SerialTinyUSB.printf("Mass Device attached, address = %d\r\n", dev_addr);
+}
+
+// Invoked when a device with MassStorage interface is unmounted
+void tuh_msc_umount_cb(uint8_t dev_addr) {
+  SerialTinyUSB.printf("Mass Device unmounted, address = %d\r\n", dev_addr);
+}
+
+// Invoked when a device with CDC (Communication Device Class) interface is mounted
+void tuh_cdc_mount_cb(uint8_t idx) {
+  printout("\n[++] CDC Device");
+  SerialTinyUSB.printf("CDC Device attached, idx = %d\r\n", idx);
+}
+
+// Invoked when a device with CDC (Communication Device Class) interface is unmounted
+void tuh_cdc_umount_cb(uint8_t idx) {
+  SerialTinyUSB.printf("CDC Device unmounted, idx = %d\r\n", idx);
+}
+
+// END of OTHER Host devices detector section
