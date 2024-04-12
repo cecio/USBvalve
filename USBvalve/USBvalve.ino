@@ -36,6 +36,8 @@
 #else
 
 #include "SSD1306AsciiWire.h"
+// LED Pin. If solid GREEN everything is OK, otherwise it will be put OFF
+#define LED_PIN   25
 
 #endif
 
@@ -109,7 +111,7 @@ bool activeState = false;
 //
 // USBvalve globals
 //
-#define VERSION "USBvalve - 0.16.0"
+#define VERSION "USBvalve - 0.17.0"
 boolean readme = false;
 boolean autorun = false;
 boolean written = false;
@@ -240,6 +242,13 @@ void setup() {
       delay(1000);  // Loop forever
     }
   }
+
+#if !defined(PIWATCH)
+  // Set up led PIN
+  gpio_init(LED_PIN);
+  gpio_set_dir(LED_PIN, GPIO_OUT);
+  gpio_put(LED_PIN, 1);
+#endif
 }
 
 // Core 1 Setup: will be used for the USB host functions for BADUSB detector
@@ -263,6 +272,9 @@ void loop() {
   if (readme == true) {
     printout("\n[!] README (R)");
     readme = false;
+#if !defined(PIWATCH)
+    gpio_put(LED_PIN, 0);         // Turn Off LED
+#endif
   }
 
   if (autorun == true) {
@@ -274,18 +286,27 @@ void loop() {
     printout("\n[!] DELETING");
     deleted = false;
     deleted_reported = true;
+#if !defined(PIWATCH)
+    gpio_put(LED_PIN, 0);         // Turn Off LED
+#endif
   }
 
   if (written == true && written_reported == false) {
     printout("\n[!] WRITING");
     written = false;
     written_reported = true;
+#if !defined(PIWATCH)
+    gpio_put(LED_PIN, 0);         // Turn Off LED
+#endif
   }
 
   if (hid_sent == true && hid_reported == false) {
     printout("\n[!!] HID Sending data");
     hid_sent = false;
     hid_reported = true;
+#if !defined(PIWATCH)
+    gpio_put(LED_PIN, 0);         // Turn Off LED
+#endif
   }
 
   if (BOOTSEL) {
@@ -495,6 +516,9 @@ void tuh_hid_mount_cb(uint8_t dev_addr, uint8_t instance, uint8_t const* desc_re
   tuh_vid_pid_get(dev_addr, &vid, &pid);
 
   printout("\n[!!] HID Device");
+#if !defined(PIWATCH)
+    gpio_put(LED_PIN, 0);         // Turn Off LED
+#endif
 
   SerialTinyUSB.printf("HID device address = %d, instance = %d mounted\r\n", dev_addr, instance);
   SerialTinyUSB.printf("VID = %04x, PID = %04x\r\n", vid, pid);
