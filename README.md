@@ -125,9 +125,10 @@ The mapping is the following:
 
 If you want to use the DEBUG functions, you can also place a header on the 3 SWD PINs at the bottom of the board.
 
-### With USBpipe PCB
+#### With USBpipe PCB
 
-[!WARNING]> This PCB is for experienced electronic makers
+> [!CAUTION]
+> This PCB is for experienced electronic makers
 > **DON'T USE IT IF YOU CAN'T SURE YOU CAN HANDLE IT!**
 
 <img src="https://github.com/cecio/USBvalve/blob/main/pictures/USBpipe_finished_oled.jpg" alt="USBpipe PCB"/>
