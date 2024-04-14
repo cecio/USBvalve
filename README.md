@@ -125,6 +125,22 @@ The mapping is the following:
 
 If you want to use the DEBUG functions, you can also place a header on the 3 SWD PINs at the bottom of the board.
 
+#### With USBpipe PCB
+
+> [!CAUTION]
+> This PCB is for experienced electronic makers
+> **DON'T USE IT IF YOU CAN'T SURE YOU CAN HANDLE IT!**
+
+<img src="./pictures/USB_pipe_finished_oled.jpg" alt="USBpipe PCB"/>
+
+[USBpipe](https://github.com/LiPolymer/smartUSBPipe) is a dedicated PCB for this project.
+
+You can find everything you need in `./PCB/USBpipe/` folder.
+
+<img src="./pictures/USB_pipe_front.png" alt="Front"/>
+
+<img src="./pictures/USB_pipe_back.png" alt="Back"/>
+
 ### Flash Firmware
 
 To flash the firmware, follow these steps:
