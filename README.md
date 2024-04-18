@@ -67,6 +67,8 @@ If you want to build your own, you need:
 
 ### Building instructions
 
+> Thanks to [Tz1rf](https://github.com/Tz1rf) we have a great [Video](https://youtu.be/7ymk8hD7-Hc) explaining the building process step-by-step.
+
 Almost all the job is done directly on the board by the software, so you just need to arrange the connection with the OLED for output.
 
 Starting from version 0.8.0 of the firmware, **USBvalve** can detect HID devices (used to detect *BADUSB*). This require an additional USB port behaving as Host. If you are not interested in this, you can use the old instructions [in docs folder](https://github.com/cecio/USBvalve/blob/main/docs/BUILDING-1.1.md) and use PCB version `1.1`. Otherwise go ahead with PCB version `1.2` (we have version for USB-A or USB-B, see folder).
