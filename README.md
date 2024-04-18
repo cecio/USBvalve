@@ -216,4 +216,5 @@ If you have question or need support you can open an `Issue` here or reach me ou
 
 ## SAFETY WARNING
 
-I've received a lot of questions about **USBvalve** and *USB killer devices*. **USBvalve** is not built to test these devices, it has not any kind of insulation or protection, so if you have the suspect you are dealing with one of these devices, test it with something else, NOT with **USBvalve** or you may damage the device, yourself or objects near to you.
+> [!WARNING]
+> I've received a lot of questions about **USBvalve** and *USB killer devices*. **USBvalve** is not built to test these devices, it has not any kind of insulation or protection, so if you have the suspect you are dealing with one of these devices, test it with something else, NOT with **USBvalve** or you may damage the device, yourself or objects near to you.
