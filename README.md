@@ -52,7 +52,7 @@ This is also fully compatible with the [Waveshare RP2040-LCD-1.28](https://www.w
 
 `pictures`: images and resources used in this doc
 
-`STL`: STL files for enclosure. In `1.1` and `1.2` folders there are full enclosures (thanks to [WhistleMaster](https://github.com/WhistleMaster)). If you want something lighter to protect the LCD you can go with `USBvalve_sliding_cover.stl`.
+`STL`: STL files for enclosure. In `1.1` and `1.2` folders there are full enclosures (thanks to [WhistleMaster](https://github.com/WhistleMaster)). In folders `1.2_64` and `1.2_64_simple` there are enclosures for the 128x64 screen (thanks to [rtmq0227](https://github.com/rtmq0227)). If you want something lighter to protect the LCD you can go with `USBvalve_sliding_cover.stl`.
 
 ## Build USBvalve
 
