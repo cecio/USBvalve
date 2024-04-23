@@ -131,7 +131,7 @@ If you want to use the DEBUG functions, you can also place a header on the 3 SWD
 
 > [!CAUTION]
 > This PCB is for experienced electronic makers
-> **DON'T USE IT IF YOU CAN'T SURE YOU CAN HANDLE IT!**
+> **DON'T USE IT IF YOU AREN'T SURE YOU CAN HANDLE IT!**
 
 <img src="./pictures/USB_pipe_finished_oled.jpg" alt="USBpipe PCB"/>
 
