@@ -21,7 +21,7 @@
 
 // Uncomment the following to compile for the RP2040 based TFT round display
 // https://www.raspberrypi.com/news/how-to-build-your-own-raspberry-pi-watch/
-//#define PIWATCH
+#define PIWATCH
 
 #include <pio_usb.h>
 #include "Adafruit_TinyUSB.h"
@@ -35,7 +35,11 @@
 
 #else
 
-#include "SSD1306AsciiWire.h"
+#include <SPI.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
 // LED Pin. If solid GREEN everything is OK, otherwise it will be put OFF
 #define LED_PIN   25
 
@@ -78,9 +82,10 @@ Arduino_GFX *gfx = new Arduino_GC9A01(bus, GFX_RST, 1 /* rotation */, true /* IP
 
 #define I2C_ADDRESS 0x3C  // 0X3C+SA0 - 0x3C or 0x3D
 #define RST_PIN -1        // Define proper RST_PIN if required.
+#define OLED_WIDTH  128
 #define OLED_HEIGHT 32    // 64 or 32 depending on the OLED
-#define OLED_LINES (OLED_HEIGHT / 8)
-SSD1306AsciiWire display;
+
+Adafruit_SSD1306 display(OLED_WIDTH, OLED_HEIGHT, &Wire, RST_PIN);
 
 #endif
 
@@ -111,7 +116,7 @@ bool activeState = false;
 //
 // USBvalve globals
 //
-#define VERSION "USBvalve - 0.17.0"
+#define VERSION "USBvalve - 0.18.0"
 boolean readme = false;
 boolean autorun = false;
 boolean written = false;
@@ -204,30 +209,18 @@ void setup() {
   gfx->draw16bitRGBBitmap(10,0,background,210,210);    // Draw background
   delay(2000);
 #else
-  Wire.begin();
-  Wire.setClock(400000L);
-#if OLED_HEIGHT == 64
 #if RST_PIN >= 0
-  display.begin(&Adafruit128x64, I2C_ADDRESS, RST_PIN);
+  display.begin(SSD1306_SWITCHCAPVCC, I2C_ADDRESS, RST_PIN);
 #else
-  display.begin(&Adafruit128x64, I2C_ADDRESS);
+  display.begin(SSD1306_SWITCHCAPVCC, I2C_ADDRESS);
 #endif
-#else
-#if RST_PIN >= 0
-  display.begin(&Adafruit128x32, I2C_ADDRESS, RST_PIN);
-#else
-  display.begin(&Adafruit128x32, I2C_ADDRESS);
-#endif
-#endif
-#endif
+#endif 
 
 #if defined(PIWATCH)
-  // gfx->setTextSize(tsb);
   gfx->setTextSize(1);
   gfx->setTextColor(MAGENTA);
 #else
-  display.setFont(Adafruit5x7);
-  display.setScrollMode(SCROLL_MODE_AUTO);
+  display.setTextSize(1);
 #endif
 
   cls();  // Clear display
@@ -432,9 +425,38 @@ void printout(const char *str)
   }
 }
 #else
+
+void scrollUp(uint8_t pixels) {
+  // Read the current content of the display, shift it up by 'pixels' rows
+  display.startscrollright(0x00, 0x07); // Dummy values to initiate scroll
+  display.stopscroll(); // Immediately stop to manually shift pixels in memory
+  for (int i = 0; i < display.height() - pixels; i++) {
+    for (int j = 0; j < display.width(); j++) {
+      uint8_t color = display.getPixel(j, i + pixels);
+      display.drawPixel(j, i, color);
+    }
+  }
+
+  // Clear the freed space after scrolling
+  display.fillRect(0, display.height() - pixels, display.width(), pixels, SSD1306_BLACK);
+  // Refresh the display to show the changes
+  display.display();
+}
+
+void checkAndScroll() {
+  // Assumes text height of 8 pixels, but check for 16 because newline is not used
+  if ((display.getCursorY() + 16) > display.height()) {
+    // Scroll up by 8 pixels
+    scrollUp(8);
+    display.setCursor(0, display.getCursorY() - 8);
+  }
+}
+
 void printout(const char *str)
 {
-  display.print(str);  
+  checkAndScroll();
+  display.print(str);
+  display.display();
 }
 #endif
 
@@ -450,7 +472,9 @@ void cls(void) {
 #else
 // Clear display
 void cls(void) {
-  display.clear();
+  display.clearDisplay();
+  display.setTextColor(SSD1306_WHITE);
+  display.setCursor(0, 0);
   printout(VERSION);
   printout("\n-----------------");
 }
