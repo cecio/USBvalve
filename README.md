@@ -216,7 +216,8 @@ If you have question or need support you can open an `Issue` here or reach me ou
 
 ### Community versions
 
-We have some forks implementing support for other boards, or other mods you may want to test:
+The Community created some forks implementing support for other boards, or other modifications. **Thank you to everyone** who contributed to the development of **USBvalve**.
+Here below an unofficial/incomplete/unsupported list:
 - [USBvalve-tbfa-Mod](https://github.com/TryBreakFixAgain/USBvalve-tbfa-Mod)
 
 ## SAFETY WARNING
