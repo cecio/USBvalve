@@ -214,6 +214,11 @@ If you have ideas or improvements in your mind, I encourage you to open an issue
 
 If you have question or need support you can open an `Issue` here or reach me out on Twitter/X [@red5heep](https://twitter.com/red5heep)
 
+### Community versions
+
+We have some forks implementing support for other boards, or other mods you may want to test:
+- [USBvalve-tbfa-Mod](https://github.com/TryBreakFixAgain/USBvalve-tbfa-Mod)
+
 ## SAFETY WARNING
 
 > [!WARNING]
