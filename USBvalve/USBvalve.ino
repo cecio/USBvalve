@@ -116,7 +116,7 @@ bool activeState = false;
 //
 // USBvalve globals
 //
-#define VERSION "USBvalve - 0.18.0"
+#define VERSION "USBvalve - 0.18.1"
 boolean readme = false;
 boolean autorun = false;
 boolean written = false;
@@ -423,6 +423,9 @@ void printout(const char *str)
   } else {
     gfx->print(str);
   }
+
+  // Output on serial device
+  SerialTinyUSB.println(str);
 }
 #else
 
@@ -457,6 +460,9 @@ void printout(const char *str)
   checkAndScroll();
   display.print(str);
   display.display();
+
+  // Output on serial device
+  SerialTinyUSB.println(str);
 }
 #endif
 
