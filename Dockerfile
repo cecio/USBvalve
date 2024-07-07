@@ -24,11 +24,11 @@ RUN cd /app \
     && export PATH=$PATH:/app/arduino-cli/bin \
     && arduino-cli --additional-urls https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json core search 2040 \
     && arduino-cli --additional-urls https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json core install rp2040:rp2040 \
-    && arduino-cli lib install "Adafruit TinyUSB Library" \
-    && arduino-cli lib install "Adafruit SSD1306" \
-    && arduino-cli lib install "Pico PIO USB" \
-    && arduino-cli lib install "XxHash_arduino" \
-    && arduino-cli lib install "GFX Library for Arduino"
+    && arduino-cli lib install "Adafruit TinyUSB Library@3.3.1" \
+    && arduino-cli lib install "Adafruit SSD1306@2.5.10" \
+    && arduino-cli lib install "Pico PIO USB@0.5.3" \
+    && arduino-cli lib install "XxHash_arduino@2.1.0" \
+    && arduino-cli lib install "GFX Library for Arduino@1.4.7"
 
 # Compilation setup
 RUN echo  "#!/bin/bash" > /app/entrypoint.sh \
