@@ -61,7 +61,7 @@ This is also fully compatible with the [Waveshare RP2040-LCD-1.28](https://www.w
 If you want to build your own, you need:
 
 - A Raspberry Pi Pico (or another RP2040 based board, like Arduino Nano RP2040)
-- an I2C OLED screen 128x64 or 128x32
+- an I2C OLED screen 128x64 or 128x32 (SSD1306)
 - (optional) a **USBvalve** PCB or a breadboard
 - (optional) a 3D printed spacer to isolate the screen from the board (https://www.thingiverse.com/thing:4748043), but you can use a piece of electrical tape instead
 
