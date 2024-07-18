@@ -193,6 +193,8 @@ Obviously you can also build your own firmware. To build the *standard* one I us
 - `Adafruit TinyUSB Library` version `3.3.1`, `Pico-PIO-USB` version `0.5.3`, Board `Raspberry Pi RP2040 (3.9.3)` setting Tools=>CPU Speed at `120MHz` and Tools=>USB Stack to `Adafruit TinyUSB`
 - `Adafruit_SSD1306` OLED library version `2.5.10`
 
+Remember to add `https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json` in the `Additional Board Manager URLs` to install the proper board.
+
 If you want to re-create a new fake filesystem, you may want to have a look to the `utils` folder, where I placed some utilities to build a new one.
 
 #### Dockerfile
