@@ -133,6 +133,10 @@ If you want to use the DEBUG functions, you can also place a header on the 3 SWD
 > This PCB is for experienced electronic makers
 > **DON'T USE IT IF YOU AREN'T SURE YOU CAN HANDLE IT!**
 
+> [!NOTE]
+> R7 and R8 aren't actually connected to anything. They are added for circuit debugging purposes.
+> So they don't show up in the BOM
+
 <img src="./pictures/USB_pipe_finished_oled.jpg" alt="USBpipe PCB"/>
 
 [USBpipe](https://github.com/LiPolymer/smartUSBPipe) is a dedicated PCB for this project.
