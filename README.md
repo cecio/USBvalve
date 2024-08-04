@@ -133,15 +133,21 @@ If you want to use the DEBUG functions, you can also place a header on the 3 SWD
 > This PCB is for experienced electronic makers
 > **DON'T USE IT IF YOU AREN'T SURE YOU CAN HANDLE IT!**
 
-<img src="./pictures/USB_pipe_finished_oled.jpg" alt="USBpipe PCB"/>
+> [!NOTE]
+> R7 and R8 aren't actually connected to anything. They are added for circuit debugging purposes.
+> So they don't show up in the BOM
+
+<img src="./pictures/USB_pipe_finished_oled.jpg" alt="USBpipe PCB" width="15%" height="15%"/>
+
+<img src="./pictures/USB_pipe_using.jpg" alt="USBpipe" width="15%" height="15%"/>
 
 [USBpipe](https://github.com/LiPolymer/smartUSBPipe) is a dedicated PCB for this project.
 
 You can find everything you need in `./PCB/USBpipe/` folder.
 
-<img src="./pictures/USB_pipe_front.png" alt="Front"/>
+<img src="./pictures/USB_pipe_front.png" alt="Front" width="20%" height="20%"/>
 
-<img src="./pictures/USB_pipe_back.png" alt="Back"/>
+<img src="./pictures/USB_pipe_back.png" alt="Back" width="20%" height="20%"/>
 
 ### Flash Firmware
 
