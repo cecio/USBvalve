@@ -196,8 +196,8 @@ I grouped most of the variables you may want to modify in this section ([see Doc
 Obviously you can also build your own firmware. To build the *standard* one I used:
 
 - Arduino IDE `2.3.2`
-- `Adafruit TinyUSB Library` version `3.3.1`, `Pico-PIO-USB` version `0.5.3`, Board `Raspberry Pi RP2040 (3.9.3)` setting Tools=>CPU Speed at `120MHz` and Tools=>USB Stack to `Adafruit TinyUSB`
-- `Adafruit_SSD1306` OLED library version `2.5.10`
+- `Adafruit TinyUSB Library` version `3.3.3`, `Pico-PIO-USB` version `0.6.1`, Board `Raspberry Pi RP2040 (4.0.1)` setting Tools=>CPU Speed at `120MHz` and Tools=>USB Stack to `Adafruit TinyUSB`
+- `Adafruit_SSD1306` OLED library version `2.5.11`
 
 Remember to add `https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json` in the `Additional Board Manager URLs` to install the proper board.
 
