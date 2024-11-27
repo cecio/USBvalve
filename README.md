@@ -67,7 +67,7 @@ If you want to build your own, you need:
 
 ### Building instructions
 
-> Thanks to [Tz1rf](https://github.com/Tz1rf) we have a great [Video](https://youtu.be/7ymk8hD7-Hc) explaining the building process step-by-step.
+> Thanks to [Tz1rf](https://github.com/Tz1rf) we also have two great videos: one explaining the [building](https://youtu.be/7ymk8hD7-Hc) process step-by-step, and another showing how to [upload firmware](https://youtu.be/Tp8xvrlqxUY) and use the tool.
 
 Almost all the job is done directly on the board by the software, so you just need to arrange the connection with the OLED for output.
 
