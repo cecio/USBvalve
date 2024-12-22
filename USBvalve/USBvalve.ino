@@ -21,7 +21,7 @@
 
 // Uncomment the following to compile for the RP2040 based TFT round display
 // https://www.raspberrypi.com/news/how-to-build-your-own-raspberry-pi-watch/
-//#define PIWATCH
+#define PIWATCH
 
 #include <pio_usb.h>
 #include "Adafruit_TinyUSB.h"
@@ -116,7 +116,7 @@ bool activeState = false;
 //
 // USBvalve globals
 //
-#define VERSION "USBvalve - 0.19.1"
+#define VERSION "USBvalve - 0.20.0"
 boolean readme = false;
 boolean autorun = false;
 boolean written = false;
@@ -125,6 +125,8 @@ boolean written_reported = false;
 boolean deleted_reported = false;
 boolean hid_sent = false;
 boolean hid_reported = false;
+
+static spin_lock_t *lock;
 
 //
 // Anti-Detection settings.
@@ -159,6 +161,9 @@ uint valid_hash = 2362816530;
 
 // Core 0 Setup: will be used for the USB mass device functions
 void setup() {
+  // Initialize the spinlock
+  lock = spin_lock_instance(0);
+
   // Change all the USB Pico settings
   TinyUSBDevice.setID(USB_VENDORID, USB_PRODUCTID);
   TinyUSBDevice.setProductDescriptor(USB_DESCRIPTOR);
@@ -537,6 +542,9 @@ static uint8_t const keycode2ascii[128][2] = { HID_KEYCODE_TO_ASCII };
 
 // Invoked when device with hid interface is mounted
 void tuh_hid_mount_cb(uint8_t dev_addr, uint8_t instance, uint8_t const* desc_report, uint16_t desc_len) {
+
+  uint32_t lock_num = spin_lock_blocking(lock);
+
   uint16_t vid, pid;
   const char* protocol_str[] = { "None", "Keyboard", "Mouse" };
 
@@ -557,19 +565,25 @@ void tuh_hid_mount_cb(uint8_t dev_addr, uint8_t instance, uint8_t const* desc_re
   if (!tuh_hid_receive_report(dev_addr, instance)) {
     SerialTinyUSB.printf("Error: cannot request to receive report\r\n");
   }
+
+  spin_unlock(lock, lock_num);
 }
 
 // Invoked when device with hid interface is un-mounted
 void tuh_hid_umount_cb(uint8_t dev_addr, uint8_t instance) {
+  uint32_t lock_num = spin_lock_blocking(lock);
   SerialTinyUSB.printf("HID device address = %d, instance = %d unmounted\r\n", dev_addr, instance);
 
   // Reset HID sent flag
   hid_sent = false;
   hid_reported = false;
+  spin_unlock(lock, lock_num);
 }
 
 // Invoked when received report from device
 void tuh_hid_report_received_cb(uint8_t dev_addr, uint8_t instance, uint8_t const* report, uint16_t len) {
+
+  uint32_t lock_num = spin_lock_blocking(lock);
 
   static bool kbd_printed = false;
   static bool mouse_printed = false;
@@ -608,6 +622,8 @@ void tuh_hid_report_received_cb(uint8_t dev_addr, uint8_t instance, uint8_t cons
   if (!tuh_hid_receive_report(dev_addr, instance)) {
     SerialTinyUSB.println("Error: cannot request to receive report");
   }
+
+  spin_unlock(lock, lock_num);
 }
 
 static inline bool find_key_in_report(hid_keyboard_report_t const* report, uint8_t keycode) {
@@ -727,24 +743,32 @@ void cursor_movement(int8_t x, int8_t y, int8_t wheel) {
 
 // Invoked when a device with MassStorage interface is mounted
 void tuh_msc_mount_cb(uint8_t dev_addr) {
+  uint32_t lock_num = spin_lock_blocking(lock);
   printout("\n[++] Mass Device");
   SerialTinyUSB.printf("Mass Device attached, address = %d\r\n", dev_addr);
+  spin_unlock(lock, lock_num);
 }
 
 // Invoked when a device with MassStorage interface is unmounted
 void tuh_msc_umount_cb(uint8_t dev_addr) {
+  uint32_t lock_num = spin_lock_blocking(lock);
   SerialTinyUSB.printf("Mass Device unmounted, address = %d\r\n", dev_addr);
+  spin_unlock(lock, lock_num);
 }
 
 // Invoked when a device with CDC (Communication Device Class) interface is mounted
 void tuh_cdc_mount_cb(uint8_t idx) {
+  uint32_t lock_num = spin_lock_blocking(lock);
   printout("\n[++] CDC Device");
   SerialTinyUSB.printf("CDC Device attached, idx = %d\r\n", idx);
+  spin_unlock(lock, lock_num);
 }
 
 // Invoked when a device with CDC (Communication Device Class) interface is unmounted
 void tuh_cdc_umount_cb(uint8_t idx) {
+  uint32_t lock_num = spin_lock_blocking(lock);
   SerialTinyUSB.printf("CDC Device unmounted, idx = %d\r\n", idx);
+  spin_unlock(lock, lock_num);
 }
 
 // END of OTHER Host devices detector section
