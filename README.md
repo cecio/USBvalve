@@ -199,7 +199,7 @@ Obviously you can also build your own firmware. To build the *standard* one I us
 - `Adafruit TinyUSB Library` version `3.4.2`, `Pico-PIO-USB` version `0.6.1`, Board `Raspberry Pi RP2040 (4.4.0)` setting Tools=>CPU Speed at `133MHz` and Tools=>USB Stack to `Adafruit TinyUSB`
 - `Adafruit_SSD1306` OLED library version `2.5.13`
 
-Remember to add `https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json` in the `Additional Board Manager URLs` to install the proper board. Also, starting from `TinyUSB` version `3.4.2` is necessary to force the following macro setting `DCFG_TUD_CDC=1`. I strongly suggesto you to use the provided *Dockerfiles* (see below).
+Remember to add `https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json` in the `Additional Board Manager URLs` to install the proper board. Also, starting from `TinyUSB` version `3.4.2` is necessary to force the following macro setting `DCFG_TUD_CDC=1`. I strongly suggest you to use the provided *Dockerfiles* (see below).
 
 If you want to re-create a new fake filesystem, you may want to have a look to the `utils` folder, where I placed some utilities to build a new one.
 
@@ -207,7 +207,7 @@ If you want to re-create a new fake filesystem, you may want to have a look to t
 
 If you want to build your own firmware, after you customized it, I provide a `Dockerfile` which builds a complete **Arduino** environment and compile the firmware. I added them for both `Pico` version 1 and 2.
 
-Enter the following commands in the main `USBvalve` folder:
+Enter the following commands in the main `USBvalve` folder to build for Pico `v1`:
 
 ```
 docker build -t usbvalve-pico1/arduino-cli -f Dockerfile.pico1 .
