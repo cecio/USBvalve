@@ -21,7 +21,7 @@
 
 // Uncomment the following to compile for the RP2040 based TFT round display
 // https://www.raspberrypi.com/news/how-to-build-your-own-raspberry-pi-watch/
-#define PIWATCH
+//#define PIWATCH
 
 #include <pio_usb.h>
 #include "Adafruit_TinyUSB.h"
