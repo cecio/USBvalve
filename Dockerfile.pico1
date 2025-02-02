@@ -23,17 +23,17 @@ RUN cd /app \
     && ./install.sh \
     && export PATH=$PATH:/app/arduino-cli/bin \
     && arduino-cli --additional-urls https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json core search 2040 \
-    && arduino-cli --additional-urls https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json core install rp2040:rp2040@4.4.0 \
+    && arduino-cli --additional-urls https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json core install rp2040:rp2040@4.4.2 \
     && arduino-cli lib install "Adafruit TinyUSB Library@3.4.2" \
     && arduino-cli lib install "Adafruit SSD1306@2.5.13" \
     && arduino-cli lib install "Pico PIO USB@0.6.1" \
     && arduino-cli lib install "XxHash_arduino@2.1.0" \
-    && arduino-cli lib install "GFX Library for Arduino@1.5.0"
+    && arduino-cli lib install "GFX Library for Arduino@1.5.3"
 
 # Compilation setup
 RUN echo  "#!/bin/bash" > /app/entrypoint.sh \
     && echo  "export PATH=\$PATH:/app/arduino-cli/bin" >> /app/entrypoint.sh \
-    && echo  "arduino-cli compile --fqbn rp2040:rp2040:rpipico --build-property \"build.extra_flags=-DCFG_TUD_CDC=1\" --board-options \"usbstack=tinyusb\" --board-options \"freq=120\" --output-dir \"/mnt/USBvalve_out\" \"\$1\"" >> /app/entrypoint.sh \
+    && echo  "arduino-cli compile --fqbn rp2040:rp2040:rpipico --build-property \"build.extra_flags=-DCFG_TUD_CDC=1\" --board-options \"usbstack=tinyusb\" --board-options \"freq=240\" --output-dir \"/mnt/USBvalve_out\" \"\$1\"" >> /app/entrypoint.sh \
     && chmod +x /app/entrypoint.sh
 
 ENTRYPOINT ["/app/entrypoint.sh"]
