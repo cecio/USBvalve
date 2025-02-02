@@ -116,7 +116,7 @@ bool activeState = false;
 //
 // USBvalve globals
 //
-#define VERSION "USBvalve - 0.20.0"
+#define VERSION "USBvalve - 0.21.0"
 boolean readme = false;
 boolean autorun = false;
 boolean written = false;
@@ -125,6 +125,7 @@ boolean written_reported = false;
 boolean deleted_reported = false;
 boolean hid_sent = false;
 boolean hid_reported = false;
+uint hid_event_num = 0;
 
 static spin_lock_t *lock;
 
@@ -252,7 +253,12 @@ void setup() {
 // Core 1 Setup: will be used for the USB host functions for BADUSB detector
 void setup1() {
   // Set a custom clock (multiple of 12Mhz) to achieve maximum compatibility for HID
+  // Differntiated between Pico 1 and Pico 2
+#ifdef PICO_RP2350
   set_sys_clock_khz(144000, true);
+#elif defined PICO_RP2040
+  set_sys_clock_khz(240000, true);
+#endif
 
   pio_usb_configuration_t pio_cfg = PIO_USB_DEFAULT_CONFIG;
   pio_cfg.pin_dp = HOST_PIN_DP;
@@ -308,8 +314,22 @@ void loop() {
   }
 
   if (BOOTSEL) {
-    printout("\n[+] RESETTING");
-    swreset();
+    uint32_t press_start = to_ms_since_boot(get_absolute_time());
+    while (BOOTSEL) {
+      sleep_ms(10);
+    }
+    uint32_t press_end = to_ms_since_boot(get_absolute_time());
+    uint32_t press_duration = press_end - press_start;
+
+    if (press_duration > 2000) {              // Press duration > 2sec
+      // Print the number of HID events detected so far
+      char outstr[22];
+      snprintf(outstr, 21, "\n[+] HID Evt# %d", hid_event_num);
+      printout(outstr);
+    } else {
+      printout("\n[+] RESETTING");
+      swreset();
+    }
   }
 }
 
@@ -577,6 +597,7 @@ void tuh_hid_umount_cb(uint8_t dev_addr, uint8_t instance) {
   // Reset HID sent flag
   hid_sent = false;
   hid_reported = false;
+  hid_event_num = 0;
   spin_unlock(lock, lock_num);
 }
 
@@ -602,6 +623,7 @@ void tuh_hid_report_received_cb(uint8_t dev_addr, uint8_t instance, uint8_t cons
         mouse_printed = false;
       }
       process_kbd_report((hid_keyboard_report_t const*)report);
+      hid_event_num++;
       break;
 
     case HID_ITF_PROTOCOL_MOUSE:
@@ -611,11 +633,13 @@ void tuh_hid_report_received_cb(uint8_t dev_addr, uint8_t instance, uint8_t cons
         kbd_printed = false;
       }
       process_mouse_report((hid_mouse_report_t const*)report);
+      hid_event_num++;
       break;
 
     default:
       // Generic report: for the time being we use kbd for this as well
       process_kbd_report((hid_keyboard_report_t const*)report);
+      hid_event_num++;
       break;
   }
 
