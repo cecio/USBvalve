@@ -1,0 +1,6 @@
+[submodule "lib/pico-pio-usb"]
+	path = lib/pico-pio-usb
+	url = https://github.com/sekigon-gonnoc/Pico-PIO-USB.git
+[submodule "lib/xxhash"]
+	path = lib/xxhash
+	url = https://github.com/Cyan4973/xxHash.git

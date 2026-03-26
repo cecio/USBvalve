@@ -1,5 +1,13 @@
 <h1><img width="300" alt="logo, landscape, dark text, transparent background" src="https://github.com/cecio/USBvalve/blob/main/pictures/USBvalve_logo_scaled.png"></a></h1>
 
+> [!NOTE]
+> **USBvalve Version 1.0.0**
+> A complete rewrite of the application has been done:
+> - moved away from Arduino IDE environment, now the code is written for the [Pi Pico SDK](https://github.com/raspberrypi/pico-sdk)
+> - dependencies on external libraries has been reduced a lot
+> - USB host support for Low Speed devices is now more robust (ATTiny85, EvilCrow, etc)
+> -  hardware and functionalities are almost unchanged, see the [notes](https://github.com/cecio/USBvalve#notes-about-bootsel-and-version--100) below for details 
+
 ### *Expose USB activity on the fly*
 
 <p float="left">
@@ -42,11 +50,11 @@ This is also fully compatible with the [Waveshare RP2040-LCD-1.28](https://www.w
 
 `docs`: documentation about the project, with a presentation where you can have a look to all the features
 
-`firmware`: pre-built firmware for the Raspberry Pi Pico. You can just use these and flash them on the board. I prepared the two versions for 32 and 64 OLED versions
+`firmware`: pre-built firmwares for the Raspberry Pi Pico. You can just use these and flash them on the board. We have several different versions, for 32 or 64 lines OLEDs, for Pico 1 or Pico2, Pi Pico Watch, etc
 
 `PCB`: Gerber file if you want to print the custom PCB . It's not mandatory, you can use your own or build it on a breadboard
 
-`USBvalve`: sources, if you want to modify and build the firmware by yourself
+`src` and `data`: sources, if you want to modify and build the firmware yourself
 
 `utils`: some utilities you may use to build a custom FS
 
@@ -60,10 +68,24 @@ This is also fully compatible with the [Waveshare RP2040-LCD-1.28](https://www.w
 
 If you want to build your own, you need:
 
-- A Raspberry Pi Pico 1 or 2 (or another RP2040 based board, like Arduino Nano RP2040)
-- an I2C OLED screen 128x64 or 128x32 (SSD1306)
+- A Raspberry Pi Pico 1 or 2 (or another RP2040 based board)
+- an I2C OLED screen 128x64 or 128x32 (**SSD1306**)
 - (optional) a **USBvalve** PCB or a breadboard
 - (optional) a 3D printed spacer to isolate the screen from the board (https://www.thingiverse.com/thing:4748043), but you can use a piece of electrical tape instead
+
+### Notes about BOOTSEL and version >= 1.0.0
+
+In the `0.x.x` versions, BOOTSEL was used to reset the device or print the number of HID events (press > 2s).
+The polling of BOOTSEL was creating some issues to the *BADUSB* detection so this was removed from version `1.0.0` and replaced with the following two options:
+- solder a button between `GP0` and `GND` (pads 1 and 3, see pic below to see an example) to have the same functions
+- use the commands `r` (reset) and `h` (HID events) from the serial monitor
+
+<img src="https://github.com/cecio/USBvalve/blob/main/pictures/reset_button.jpg" width="35%" height="35%" />
+
+~~In `PCB` you'll find also a version `1.3` of the board, with some holes on pads 1 and 3 to facilitate the mount of the button. But as you can see, you can also use your old version~~. (still waiting the new printed PCB to test it before publishing)
+
+If you are not using the *BADUSB* functions or if you prefer to have less coverage on detection but keep BOOTSEL usage, I'm also providing a firmware created with *bootsel* enabled (see folder and releases).
+
 
 ### Building instructions
 
@@ -165,10 +187,10 @@ It's done!
 
 I don't know if it will ever be the case, but you may want to customize the firmware in order to avoid detection done by *USBvalve-aware* malware :-)
 
-I grouped most of the variables you may want to modify in this section ([see Dockerfile below for rebuilding](https://github.com/cecio/USBvalve#dockerfile))
+I grouped most of the variables you may want to modify in this section of `usb_config.h` ([see Dockerfile below for rebuilding](https://github.com/cecio/USBvalve#dockerfile))
 
 ```C
-// Anti-Detection settings.
+// USB anti-detection settings
 //
 // Set USB IDs strings and numbers, to avoid possible detections.
 // Remember that you can cusotmize FAKE_DISK_BLOCK_NUM as well
@@ -179,39 +201,55 @@ I grouped most of the variables you may want to modify in this section ([see Doc
 // Example:
 //             0x0951 0x16D5    VENDORID_STR: Kingston   PRODUCTID_STR: DataTraveler
 //
-#define USB_VENDORID 0x0951               // This override the Pi Pico default 0x2E8A
-#define USB_PRODUCTID 0x16D5              // This override the Pi Pico default 0x000A
-#define USB_DESCRIPTOR "DataTraveler"     // This override the Pi Pico default "Pico"
-#define USB_MANUF "Kingston"              // This override the Pi Pico default "Raspberry Pi"
-#define USB_SERIAL "123456789A"           // This override the Pi Pico default. Disabled by default. \
-                                          // See "setSerialDescriptor" in setup() if needed
-#define USB_VENDORID_STR "Kingston"       // Up to 8 chars
-#define USB_PRODUCTID_STR "DataTraveler"  // Up to 16 chars
-#define USB_VERSION_STR "1.0"             // Up to 4 chars
+#define USB_VENDORID       0x0951
+#define USB_PRODUCTID      0x16D5
+#define USB_DESCRIPTOR     "DataTraveler"
+#define USB_MANUF          "Kingston"
+#define USB_SERIAL         "123456789A"
+#define USB_VENDORID_STR   "Kingston"        // Up to 8 chars
+#define USB_PRODUCTID_STR  "DataTraveler"    // Up to 16 chars
+#define USB_VERSION_STR    "1.0"             // Up to 4 chars
 ```
 
 
 ### Building your firmware
 
-Obviously you can also build your own firmware. To build the *standard* one I used:
+Obviously you can also build your own firmware. To build you need the *Raspberry Pi Pico SDK* and this repoository.
 
-- Arduino IDE `2.3.4`
-- `Adafruit TinyUSB Library` version `3.6.0`, `Pico-PIO-USB` version `0.7.2`, Board `Raspberry Pi RP2040 (4.5.4)` setting Tools=>CPU Speed at `133MHz` and Tools=>USB Stack to `Adafruit TinyUSB`
-- `Adafruit_SSD1306` OLED library version `2.5.14`
-
-Remember to add `https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json` in the `Additional Board Manager URLs` to install the proper board. Also, starting from `TinyUSB` version `3.4.2` is necessary to force the following macro setting `DCFG_TUD_CDC=1`. I strongly suggest you to use the provided *Dockerfiles* (see below).
+Basic recompile instructions:
+```
+export PICO_SDK_PATH=</path/to/pico-sdk>
+mkdir build && cd build
+cmake -DPICO_BOARD=pico ..   # or pico2 for standard build
+make -j$(nproc)
+# Output: build/src/USBvalve.uf2
+```
 
 If you want to re-create a new fake filesystem, you may want to have a look to the `utils` folder, where I placed some utilities to build a new one.
 
 #### Dockerfile
 
-If you want to build your own firmware, after you customized it, I provide a `Dockerfile` which builds a complete **Arduino** environment and compile the firmware. I added them for both `Pico` version 1 and 2.
+If you want to build your own firmware, after you customized it, I provide a `Dockerfile` which builds a complete building environment and compile the firmware. 
 
-Enter the following commands in the main `USBvalve` folder to build for Pico `v1`:
+Enter the following commands in the main `USBvalve` folder to build:
 
 ```
-docker build -t usbvalve-pico1/arduino-cli -f Dockerfile.pico1 .
-docker run --rm --name usbvalve -v $PWD:/mnt usbvalve-pico1/arduino-cli /mnt/USBvalve
+# To Build:
+#       docker build -t usbvalve-sdk -f Dockerfile.sdk .
+#
+# To Run (default: pico, SSD1306 OLED 128x32):
+#       docker run --rm -v $PWD:/mnt usbvalve-sdk
+#
+# Options (via environment variables):
+#       BOARD=pico|pico2          Board target (default: pico)
+#       OLED_HEIGHT=32|64         OLED display height (default: 32)
+#       PIWATCH=1                 Use GC9A01 round TFT instead of SSD1306
+#       USE_BOOTSEL=1             Enable BOOTSEL button (disrupts Low Speed USB)
+#
+# Examples:
+#       docker run --rm -e BOARD=pico2 -v $PWD:/mnt usbvalve-sdk
+#       docker run --rm -e PIWATCH=1 -v $PWD:/mnt usbvalve-sdk
+#       docker run --rm -e BOARD=pico2 -e OLED_HEIGHT=64 -v $PWD:/mnt usbvalve-sdk
 ```
 
 The firmware will be placed with extension `uf2` in folder `USBvalve_out`.

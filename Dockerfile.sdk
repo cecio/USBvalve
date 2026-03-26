@@ -1,0 +1,59 @@
+#
+# To Build:
+#       docker build -t usbvalve-sdk -f Dockerfile.sdk .
+#
+# To Run (default: pico, SSD1306 OLED 128x32):
+#       docker run --rm -v $PWD:/mnt usbvalve-sdk
+#
+# Options (via environment variables):
+#       BOARD=pico|pico2          Board target (default: pico)
+#       OLED_HEIGHT=32|64         OLED display height (default: 32)
+#       PIWATCH=1                 Use GC9A01 round TFT instead of SSD1306
+#       USE_BOOTSEL=1             Enable BOOTSEL button (disrupts Low Speed USB)
+#
+# Examples:
+#       docker run --rm -e BOARD=pico2 -v $PWD:/mnt usbvalve-sdk
+#       docker run --rm -e PIWATCH=1 -v $PWD:/mnt usbvalve-sdk
+#       docker run --rm -e BOARD=pico2 -e OLED_HEIGHT=64 -v $PWD:/mnt usbvalve-sdk
+#
+
+FROM ubuntu:22.04
+WORKDIR /app
+
+# OS setup + ARM toolchain + CMake
+RUN apt-get update -y \
+    && apt-get install -y git cmake gcc-arm-none-eabi libnewlib-arm-none-eabi \
+       build-essential libstdc++-arm-none-eabi-newlib python3 \
+    && apt-get autoremove -y \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Clone Pico SDK
+RUN cd /app \
+    && git clone --depth 1 https://github.com/raspberrypi/pico-sdk.git \
+    && cd pico-sdk \
+    && git submodule update --init
+
+ENV PICO_SDK_PATH=/app/pico-sdk
+
+# Build script
+RUN echo '#!/bin/bash' > /app/entrypoint.sh \
+    && echo 'set -e' >> /app/entrypoint.sh \
+    && echo 'BOARD="${BOARD:-pico}"' >> /app/entrypoint.sh \
+    && echo 'if [ -d /mnt/USBvalve-sdk ]; then cd /mnt/USBvalve-sdk; elif [ -f /mnt/src/main.c ]; then cd /mnt; else echo "Error: mount the repo root or USBvalve-sdk dir to /mnt"; exit 1; fi' >> /app/entrypoint.sh \
+    && echo 'rm -rf build && mkdir build && cd build' >> /app/entrypoint.sh \
+    && echo 'CMAKE_ARGS="-DPICO_BOARD=$BOARD"' >> /app/entrypoint.sh \
+    && echo '[ -n "$OLED_HEIGHT" ] && CMAKE_ARGS="$CMAKE_ARGS -DOLED_HEIGHT=$OLED_HEIGHT"' >> /app/entrypoint.sh \
+    && echo '[ -n "$PIWATCH" ] && CMAKE_ARGS="$CMAKE_ARGS -DPIWATCH=$PIWATCH"' >> /app/entrypoint.sh \
+    && echo '[ -n "$USE_BOOTSEL" ] && CMAKE_ARGS="$CMAKE_ARGS -DUSE_BOOTSEL=$USE_BOOTSEL"' >> /app/entrypoint.sh \
+    && echo 'echo "Building for $BOARD with: $CMAKE_ARGS"' >> /app/entrypoint.sh \
+    && echo 'cmake $CMAKE_ARGS ..' >> /app/entrypoint.sh \
+    && echo 'make -j$(nproc)' >> /app/entrypoint.sh \
+    && echo 'SUFFIX="$BOARD"' >> /app/entrypoint.sh \
+    && echo '[ -n "$PIWATCH" ] && SUFFIX="${SUFFIX}-piwatch"' >> /app/entrypoint.sh \
+    && echo 'mkdir -p /mnt/USBvalve_out' >> /app/entrypoint.sh \
+    && echo 'cp src/USBvalve.uf2 /mnt/USBvalve_out/USBvalve-sdk-${SUFFIX}.uf2' >> /app/entrypoint.sh \
+    && echo 'echo "Build complete: USBvalve_out/USBvalve-sdk-${SUFFIX}.uf2"' >> /app/entrypoint.sh \
+    && chmod +x /app/entrypoint.sh
+
+ENTRYPOINT ["/app/entrypoint.sh"]
