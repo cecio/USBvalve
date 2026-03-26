@@ -220,6 +220,9 @@ Obviously you can also build your own firmware. To build you need the *Raspberry
 Basic recompile instructions:
 ```
 export PICO_SDK_PATH=</path/to/pico-sdk>
+
+git clone --recursive https://github.com/cecio/USBvalve.git
+cd USBvalve
 mkdir build && cd build
 cmake -DPICO_BOARD=pico ..   # or pico2 for standard build
 make -j$(nproc)
