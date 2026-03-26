@@ -2,6 +2,7 @@
 
 > [!NOTE]
 > **USBvalve Version 1.0.0**
+>
 > A complete rewrite of the application has been done:
 > - moved away from Arduino IDE environment, now the code is written for the [Pi Pico SDK](https://github.com/raspberrypi/pico-sdk)
 > - dependencies on external libraries has been reduced a lot
