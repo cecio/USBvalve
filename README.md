@@ -5,7 +5,7 @@
 >
 > A complete rewrite of the application has been done:
 > - moved away from Arduino IDE environment, now the code is written for the [Pi Pico SDK](https://github.com/raspberrypi/pico-sdk)
-> - dependencies on external libraries has been reduced a lot
+> - dependencies on external libraries have been reduced a lot
 > - USB host support for Low Speed devices is now more robust (ATTiny85, EvilCrow, etc)
 > -  hardware and functionalities are almost unchanged, see the [notes](https://github.com/cecio/USBvalve#notes-about-bootsel-and-version--100) below for details 
 
