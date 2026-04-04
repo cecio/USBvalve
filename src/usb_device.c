@@ -73,14 +73,17 @@ int32_t tud_msc_read10_cb(uint8_t lun, uint32_t lba, uint32_t offset,
         flag_autorun = true;
     }
 
-    // Protect memory: only read from real disk blocks
-    if (lba < DISK_BLOCK_NUM - 1) {
-        uint8_t const* addr = msc_disk[lba];
-        memcpy(buffer, addr, bufsize);
+    // Return data from ramdisk, or zeros for blocks beyond it.
+    // The disk reports FAKE_DISK_BLOCK_NUM sectors but only
+    // DISK_BLOCK_NUM exist in RAM — the rest must read as empty.
+    if (lba < DISK_BLOCK_NUM) {
+        memcpy(buffer, msc_disk[lba], bufsize);
+    } else {
+        memset(buffer, 0, bufsize);
     }
 
     serial_printf("Read LBA: %u   Size: %u\r\n", (unsigned)lba, (unsigned)bufsize);
-    if (lba < DISK_BLOCK_NUM - 1) {
+    if (lba < DISK_BLOCK_NUM) {
         hex_dump(msc_disk[lba], MAX_DUMP_BYTES);
     }
 
@@ -105,14 +108,13 @@ int32_t tud_msc_write10_cb(uint8_t lun, uint32_t lba, uint32_t offset,
         flag_written = true;
     }
 
-    // Protect memory: only write to real disk blocks
-    if (lba < DISK_BLOCK_NUM - 1) {
-        uint8_t* addr = msc_disk[lba];
-        memcpy(addr, buffer, bufsize);
+    // Only write to real disk blocks; silently discard beyond ramdisk
+    if (lba < DISK_BLOCK_NUM) {
+        memcpy(msc_disk[lba], buffer, bufsize);
     }
 
     serial_printf("Write LBA: %u   Size: %u\r\n", (unsigned)lba, (unsigned)bufsize);
-    if (lba < DISK_BLOCK_NUM - 1) {
+    if (lba < DISK_BLOCK_NUM) {
         hex_dump(msc_disk[lba], MAX_DUMP_BYTES);
     }
 
