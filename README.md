@@ -83,7 +83,7 @@ The polling of BOOTSEL was creating some issues to the *BADUSB* detection so thi
 
 <img src="https://github.com/cecio/USBvalve/blob/main/pictures/reset_button.jpg" width="35%" height="35%" />
 
-~~In `PCB` you'll find also a version `1.3` of the board, with some holes on pads 1 and 3 to facilitate the mount of the button. But as you can see, you can also use your old version~~. (still waiting the new printed PCB to test it before publishing)
+In `PCB` you'll find also a version `1.3` of the board, with some holes on pads 1 and 3 to facilitate the mount of the button. But as you can see, you can also use your old version.
 
 If you are not using the *BADUSB* functions or if you prefer to have less coverage on detection but keep BOOTSEL usage, I'm also providing a firmware created with *bootsel* enabled (see folder and releases).
 
