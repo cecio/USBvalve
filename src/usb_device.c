@@ -75,7 +75,7 @@ int32_t tud_msc_read10_cb(uint8_t lun, uint32_t lba, uint32_t offset,
 
     // Return data from ramdisk, or zeros for blocks beyond it.
     // The disk reports FAKE_DISK_BLOCK_NUM sectors but only
-    // DISK_BLOCK_NUM exist in RAM — the rest must read as empty.
+    // DISK_BLOCK_NUM exist in RAM, the rest must read as empty.
     if (lba < DISK_BLOCK_NUM) {
         memcpy(buffer, msc_disk[lba], bufsize);
     } else {
