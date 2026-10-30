@@ -95,6 +95,9 @@ void tuh_hid_umount_cb(uint8_t dev_addr, uint8_t instance) {
 
 void tuh_hid_report_received_cb(uint8_t dev_addr, uint8_t instance,
                                  uint8_t const* report, uint16_t len) {
+    // Ignore len 0 (unplug)
+    if (len == 0) return;
+
     flag_hid_sent = true;
 
     uint8_t const itf_protocol = tuh_hid_interface_protocol(dev_addr, instance);

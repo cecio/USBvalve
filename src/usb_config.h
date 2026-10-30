@@ -2,7 +2,7 @@
 #define USB_CONFIG_H
 
 // Project version
-#define VERSION "USBvalve - 1.0.1"
+#define VERSION "USBvalve - 1.0.2"
 
 // USB anti-detection settings
 //
